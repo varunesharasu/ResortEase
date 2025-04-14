@@ -1,30 +1,12 @@
 // "use client"
 
 // import { useState, useEffect } from "react"
+// import { useNavigate } from "react-router-dom"
 // import axios from "axios"
 // import { motion } from "framer-motion"
 // import "./AdminHome.css"
-// import {
-//   Bell,
-//   BookOpen,
-//   Calendar,
-//   Check,
-//   HelpCircle,
-//   RefreshCw,
-//   User,
-//   Users,
-//   X,
-//   Clock,
-//   ArrowUp,
-//   ArrowDown,
-//   Settings,
-//   Search,
-//   MessageSquare,
-//   FileText,
-//   CreditCard,
-//   ShieldCheck,
-//   Send,
-// } from "lucide-react"
+// import { Bell, BookOpen, Calendar, Check, HelpCircle, RefreshCw, User, Users, X, Clock, ArrowUp, ArrowDown, Settings, Search, MessageSquare, FileText, CreditCard, ShieldCheck, Send } from 'lucide-react'
+// // import RoomManagement from "./room-management"
 
 // // AdminHome Component
 // const AdminHome = () => {
@@ -44,6 +26,8 @@
 //   const [unreadMessages, setUnreadMessages] = useState(0)
 //   const [messageLoading, setMessageLoading] = useState(false)
 //   const [replySending, setReplySending] = useState(false)
+//   // const [showRoomManagement, setShowRoomManagement] = useState(false)
+//   const navigate = useNavigate()
 
 //   const currentHour = new Date().getHours()
 //   let greeting = "Good morning"
@@ -68,7 +52,7 @@
 //       setMessageLoading(true)
 //       const response = await axios.get("http://localhost:5000/api/admin/messages")
 //       setMessages(response.data.messages)
-//       setUnreadMessages(response.data.messages.filter(m => !m.isRead).length)
+//       setUnreadMessages(response.data.messages.filter((m) => !m.isRead).length)
 //       setMessageLoading(false)
 //     } catch (error) {
 //       console.error("Error fetching messages:", error)
@@ -99,8 +83,8 @@
 //   const markMessageAsRead = async (id) => {
 //     try {
 //       await axios.put(`http://localhost:5000/api/admin/messages/${id}/read`)
-//       setMessages(messages.map(m => m._id === id ? { ...m, isRead: true } : m))
-//       setUnreadMessages(prev => Math.max(0, prev - 1))
+//       setMessages(messages.map((m) => (m._id === id ? { ...m, isRead: true } : m)))
+//       setUnreadMessages((prev) => Math.max(0, prev - 1))
 //     } catch (error) {
 //       console.error("Error marking message as read:", error)
 //     }
@@ -115,34 +99,28 @@
 
 //   const handleReplySubmit = async () => {
 //     if (!replyText.trim() || !selectedMessage) return
-    
+
 //     try {
 //       setReplySending(true)
 //       await axios.post(`http://localhost:5000/api/admin/messages/${selectedMessage._id}/reply`, {
-//         replyMessage: replyText
+//         replyMessage: replyText,
 //       })
-      
+
 //       // Update the message in the state with the new reply
-//       const updatedMessages = messages.map(m => {
+//       const updatedMessages = messages.map((m) => {
 //         if (m._id === selectedMessage._id) {
 //           return {
 //             ...m,
-//             replies: [
-//               ...m.replies,
-//               { message: replyText, timestamp: new Date() }
-//             ]
+//             replies: [...m.replies, { message: replyText, timestamp: new Date() }],
 //           }
 //         }
 //         return m
 //       })
-      
+
 //       setMessages(updatedMessages)
 //       setSelectedMessage({
 //         ...selectedMessage,
-//         replies: [
-//           ...selectedMessage.replies,
-//           { message: replyText, timestamp: new Date() }
-//         ]
+//         replies: [...selectedMessage.replies, { message: replyText, timestamp: new Date() }],
 //       })
 //       setReplyText("")
 //       setReplySending(false)
@@ -150,6 +128,10 @@
 //       console.error("Error sending reply:", error)
 //       setReplySending(false)
 //     }
+//   }
+
+//   const handleRoomManagement = () => {
+//     navigate("/admin/room-management")
 //   }
 
 //   useEffect(() => {
@@ -232,7 +214,7 @@
 //     const messageInterval = setInterval(() => {
 //       fetchMessages()
 //     }, 30000)
-    
+
 //     return () => clearInterval(messageInterval)
 //   }, [])
 
@@ -323,7 +305,9 @@
 //               className={`admin-notification-item ${notification.read ? "" : "admin-notification-unread"}`}
 //               onClick={() => !notification.read && markNotificationAsRead(notification._id)}
 //             >
-//               <div className={`admin-notification-icon ${getColor(notification.type)}`}>{getIcon(notification.type)}</div>
+//               <div className={`admin-notification-icon ${getColor(notification.type)}`}>
+//                 {getIcon(notification.type)}
+//               </div>
 //               <div className="admin-notification-content">
 //                 <div className="admin-notification-title-row">
 //                   <h4 className="admin-notification-title">{notification.title}</h4>
@@ -348,7 +332,7 @@
 //         </div>
 //       )
 //     }
-    
+
 //     if (!messages || messages.length === 0) {
 //       return (
 //         <div className="admin-message-empty">
@@ -381,7 +365,7 @@
 //               </div>
 //             ))}
 //           </div>
-          
+
 //           <div className="admin-message-detail">
 //             {selectedMessage ? (
 //               <>
@@ -396,7 +380,7 @@
 //                 <div className="admin-message-detail-content">
 //                   <p>{selectedMessage.message}</p>
 //                 </div>
-                
+
 //                 {selectedMessage.replies && selectedMessage.replies.length > 0 && (
 //                   <div className="admin-message-replies">
 //                     <h4>Replies</h4>
@@ -408,7 +392,7 @@
 //                     ))}
 //                   </div>
 //                 )}
-                
+
 //                 <div className="admin-message-reply-form">
 //                   <textarea
 //                     placeholder="Type your reply here..."
@@ -416,8 +400,8 @@
 //                     onChange={(e) => setReplyText(e.target.value)}
 //                     disabled={replySending}
 //                   ></textarea>
-//                   <button 
-//                     className="admin-reply-button" 
+//                   <button
+//                     className="admin-reply-button"
 //                     onClick={handleReplySubmit}
 //                     disabled={!replyText.trim() || replySending}
 //                   >
@@ -591,6 +575,7 @@
 //               title="Room Management"
 //               description="Check room availability and status"
 //               color="success"
+//               onClick={handleRoomManagement}
 //             />
 //             <QuickAccessCard
 //               icon={Users}
@@ -640,6 +625,13 @@
 
 
 
+
+
+
+
+
+
+
 "use client"
 
 import { useState, useEffect } from "react"
@@ -647,7 +639,27 @@ import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import { motion } from "framer-motion"
 import "./AdminHome.css"
-import { Bell, BookOpen, Calendar, Check, HelpCircle, RefreshCw, User, Users, X, Clock, ArrowUp, ArrowDown, Settings, Search, MessageSquare, FileText, CreditCard, ShieldCheck, Send } from 'lucide-react'
+import {
+  Bell,
+  BookOpen,
+  Calendar,
+  Check,
+  HelpCircle,
+  RefreshCw,
+  User,
+  Users,
+  X,
+  Clock,
+  ArrowUp,
+  ArrowDown,
+  Settings,
+  Search,
+  MessageSquare,
+  FileText,
+  CreditCard,
+  ShieldCheck,
+  Send,
+} from "lucide-react"
 // import RoomManagement from "./room-management"
 
 // AdminHome Component
@@ -682,8 +694,10 @@ const AdminHome = () => {
   const fetchNotifications = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/admin/notifications")
-      setNotifications(response.data.notifications)
-      setUnreadNotifications(response.data.notifications.filter((n) => !n.read).length)
+      if (response.data.success) {
+        setNotifications(response.data.notifications)
+        setUnreadNotifications(response.data.notifications.filter((n) => !n.read).length)
+      }
     } catch (error) {
       console.error("Error fetching notifications:", error)
     }
