@@ -1,0 +1,652 @@
+/* Variables for consistent styling */
+:root {
+  --primary-color: #3a8469;
+  --primary-light: #4a9a7b;
+  --primary-dark: #2d6a53;
+  --secondary-color: #f8f9fa;
+  --accent-color: #e9b44c;
+  --text-color: #2c3e50;
+  --light-text: #6c757d;
+  --white: #ffffff;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+  --transition-fast: all 0.2s ease;
+  --transition: all 0.3s ease;
+  --transition-slow: all 0.5s ease;
+  --border-radius-sm: 4px;
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  --navbar-height: 70px;
+  --navbar-height-scrolled: 60px;
+}
+
+/* Base Navbar Container */
+.navbar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--navbar-height);
+  background-color: var(--white);
+  box-shadow: var(--shadow-sm);
+  z-index: 1000;
+  transition: var(--transition);
+}
+
+.navbar-container.scrolled {
+  height: var(--navbar-height-scrolled);
+  box-shadow: var(--shadow-md);
+}
+
+.navbar-content {
+  max-width: 1200px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Brand/Logo Section */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--primary-color);
+  font-weight: 700;
+  font-size: 1.5rem;
+  transition: var(--transition);
+}
+
+.brand-link:hover {
+  transform: scale(1.05);
+}
+
+.brand-icon {
+  width: 65px;
+  height: 65px;
+  margin-right: 8px;
+}
+
+.brand-name {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transition: var(--transition);
+}
+
+/* Navigation Links */
+.navbar-links {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.nav-list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.nav-item {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  height: 100%;
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition);
+  position: relative;
+}
+
+.nav-icon {
+  margin-right: 6px;
+  font-size: 1.1rem;
+  transition: var(--transition);
+}
+
+.nav-link:hover {
+  color: var(--primary-color);
+}
+
+.nav-link:hover .nav-icon {
+  transform: translateY(-2px);
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 3px;
+  background-color: var(--primary-color);
+  transition: var(--transition);
+  transform: translateX(-50%);
+}
+
+.nav-link:hover::after {
+  width: 70%;
+}
+
+.nav-link.active {
+  color: var(--primary-color);
+}
+
+.nav-link.active::after {
+  width: 70%;
+}
+
+/* Auth Section */
+.auth-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 20px;
+}
+
+.auth-button {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  text-decoration: none;
+  transition: var(--transition);
+  cursor: pointer;
+  border: none;
+  font-size: 0.95rem;
+}
+
+.auth-icon {
+  margin-right: 6px;
+  font-size: 1rem;
+}
+
+.login-button {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+}
+
+.login-button:hover {
+  background-color: #e9ecef;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.register-button {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+.register-button:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* User Dropdown Styles */
+.user-dropdown-container {
+  position: relative;
+}
+
+.user-dropdown-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.user-dropdown-toggle:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.power-icon {
+  font-size: 1.2rem;
+}
+
+.user-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 200px;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  z-index: 1001;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  color: var(--text-color);
+  text-decoration: none;
+  transition: var(--transition-fast);
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(58, 132, 105, 0.1);
+}
+
+.dropdown-icon {
+  margin-right: 10px;
+  font-size: 1.1rem;
+}
+
+.logout-item {
+  color: #842029;
+  border-top: 1px solid #f5f5f5;
+}
+
+.logout-item:hover {
+  background-color: #f8d7da;
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+}
+
+.hamburger-line {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background-color: var(--primary-color);
+  border-radius: 10px;
+  transition: var(--transition);
+}
+
+.mobile-menu-toggle.active .hamburger-line:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+
+.mobile-menu-toggle.active .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-menu-toggle.active .hamburger-line:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+  .mobile-menu-toggle {
+    display: flex;
+  }
+
+  .navbar-links {
+    position: fixed;
+    top: var(--navbar-height);
+    left: 0;
+    width: 100%;
+    height: 0;
+    background-color: var(--white);
+    flex-direction: column;
+    align-items: flex-start;
+    overflow: hidden;
+    transition: var(--transition-slow);
+    box-shadow: var(--shadow-md);
+    opacity: 0;
+  }
+
+  .navbar-container.scrolled .navbar-links {
+    top: var(--navbar-height-scrolled);
+  }
+
+  .navbar-links.open {
+    height: calc(100vh - var(--navbar-height));
+    opacity: 1;
+    padding: 20px;
+  }
+
+  .nav-list {
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+  }
+
+  .nav-item {
+    width: 100%;
+    height: auto;
+    margin: 5px 0;
+  }
+
+  .nav-link {
+    width: 100%;
+    padding: 15px;
+    border-radius: var(--border-radius);
+  }
+
+  .nav-link::after {
+    display: none;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    background-color: rgba(58, 132, 105, 0.1);
+  }
+
+  .auth-section {
+    width: 100%;
+    margin-left: 0;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .auth-button {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .user-dropdown-container {
+    width: 100%;
+  }
+
+  .user-dropdown-toggle {
+    width: 100%;
+    border-radius: var(--border-radius);
+    height: auto;
+    padding: 12px;
+    justify-content: flex-start;
+  }
+
+  .power-icon {
+    margin-right: 10px;
+  }
+
+  .user-dropdown-toggle::after {
+    content: "User Menu";
+    font-weight: 500;
+  }
+
+  .user-dropdown-menu {
+    position: static;
+    width: 100%;
+    margin-top: 10px;
+    box-shadow: none;
+    border: 1px solid #e9ecef;
+  }
+}
+
+/* Animation for navbar appearance */
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.navbar-container {
+  animation: slideDown 0.5s ease forwards;
+}
+
+/* Pulse animation for register button */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(58, 132, 105, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(58, 132, 105, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(58, 132, 105, 0);
+  }
+}
+
+.register-button {
+  animation: pulse 2s infinite;
+}
+
+.register-button:hover {
+  animation: none;
+}
+
+/* Smooth transition for mobile menu items */
+@media (max-width: 992px) {
+  .nav-item,
+  .auth-button,
+  .user-dropdown-container {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition-delay: calc(var(--item-index) * 0.05s);
+  }
+
+  .navbar-links.open .nav-item,
+  .navbar-links.open .auth-button,
+  .navbar-links.open .user-dropdown-container {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .nav-item:nth-child(1) {
+    --item-index: 1;
+  }
+  .nav-item:nth-child(2) {
+    --item-index: 2;
+  }
+  .nav-item:nth-child(3) {
+    --item-index: 3;
+  }
+  .nav-item:nth-child(4) {
+    --item-index: 4;
+  }
+  .auth-section .auth-button:nth-child(1),
+  .auth-section .user-dropdown-container {
+    --item-index: 5;
+  }
+  .auth-section .auth-button:nth-child(2) {
+    --item-index: 6;
+  }
+}
+
+/* Add these styles to your existing Navbar.css file */
+
+/* User Avatar with Image */
+.user-avatar-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--white);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.user-avatar-image:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Dropdown User Info Section */
+.dropdown-user-info {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.dropdown-profile-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+}
+
+.dropdown-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin-right: 12px;
+}
+
+.dropdown-user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-username {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.dropdown-email {
+  font-size: 0.8rem;
+  color: var(--light-text);
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: #f5f5f5;
+  margin: 0;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 992px) {
+  .dropdown-user-info {
+    padding: 16px;
+  }
+
+  .dropdown-profile-image,
+  .dropdown-user-avatar {
+    width: 50px;
+    height: 50px;
+  }
+
+  .user-dropdown-toggle {
+    width: 100%;
+    border-radius: var(--border-radius);
+    height: auto;
+    padding: 12px;
+    justify-content: flex-start;
+  }
+
+  .user-avatar-image {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+  }
+
+  .user-dropdown-toggle::after {
+    content: "User Menu";
+    font-weight: 500;
+    margin-left: 10px;
+  }
+}
+
+/* Add these styles to handle navbar visibility */
+.navbar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--navbar-height);
+  background-color: var(--white);
+  box-shadow: var(--shadow-sm);
+  z-index: 1000;
+  transition: var(--transition);
+  transform: translateY(0);
+}
+
+.navbar-container.hidden {
+  transform: translateY(-100%);
+}
+
+.navbar-container.visible {
+  transform: translateY(0);
+}
+
+/* Update the existing animation to work with the new visibility states */
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.navbar-container.visible {
+  animation: slideDown 0.3s ease forwards;
+}
+
