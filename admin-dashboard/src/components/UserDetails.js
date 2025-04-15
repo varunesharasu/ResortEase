@@ -3,7 +3,7 @@
 // UserDetails.js
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { ArrowLeft, Mail, Phone, User, AlertCircle, MapPin, Shield, Clock, Edit, Trash, Calendar, Home, X, RefreshCw, Activity, Key, Lock, FileText, Download, UserCheck, Bell } from 'lucide-react'
+import { ArrowLeft, Mail, Phone, User, AlertCircle, MapPin, Shield, Clock, Trash, Calendar, Home, X, RefreshCw, Activity, Key, Lock, FileText, Download, UserCheck, Bell } from 'lucide-react'
 import "./UserDetails.css"
 
 const UserDetails = () => {
@@ -259,7 +259,7 @@ const UserDetails = () => {
           <span>Back to Users</span>
         </button>
 
-        {!loading && !error && user && (
+        {/* {!loading && !error && user && (
           <div className="action-buttons">
             <button className="edit-button" aria-label="Edit user">
               <Edit className="action-icon" />
@@ -270,7 +270,7 @@ const UserDetails = () => {
               <span>Delete</span>
             </button>
           </div>
-        )}
+        )} */}
       </div>
 
       {loading ? (

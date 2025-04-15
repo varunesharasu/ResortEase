@@ -177,6 +177,7 @@ body {
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
   border-radius: var(--border-radius-sm);
+  color: var(--text-dark);
 }
 
 .admin-amenity-tag svg {
@@ -184,8 +185,9 @@ body {
 }
 
 .admin-amenity-tag.admin-more {
-  background: var(--border-color);
+  /* background: var(--border-color); */
   color: var(--text-light);
+  background-color: #eef2f7;
 }
 
 /* View details button */
