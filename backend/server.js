@@ -84,6 +84,22 @@
 
 // const Message = mongoose.model("Message", messageSchema)
 
+// // Add this Notification Schema after the existing schemas
+// const notificationSchema = new mongoose.Schema({
+//   title: { type: String, required: true },
+//   message: { type: String, required: true },
+//   type: {
+//     type: String,
+//     enum: ["booking", "cancellation", "user", "system"],
+//     default: "system",
+//   },
+//   read: { type: Boolean, default: false },
+//   time: { type: Date, default: Date.now },
+//   userId: { type: String, required: false }, // Optional, for user-specific notifications
+// })
+
+// const Notification = mongoose.model("Notification", notificationSchema)
+
 // // Middleware to verify JWT token
 // const authenticateToken = (req, res, next) => {
 //   const authHeader = req.headers["authorization"]
@@ -119,6 +135,15 @@
 //     const hashedPassword = await bcrypt.hash(password, 10)
 //     const newUser = new User({ username, email, password: hashedPassword, phone, dob })
 //     await newUser.save()
+
+//     // Create a notification for new user registration
+//     const notification = new Notification({
+//       title: "New User Registration",
+//       message: `${username} has registered with email ${email}`,
+//       type: "user",
+//     })
+//     await notification.save()
+
 //     res.status(201).send("User registered successfully")
 //   } catch (error) {
 //     console.error("Error registering user:", error)
@@ -218,6 +243,19 @@
 //     })
 
 //     await newBooking.save()
+
+//     // Get user details for the notification
+//     const user = await User.findById(userId)
+
+//     // Create a notification for new booking
+//     const notification = new Notification({
+//       title: "New Booking",
+//       message: `${user.username} has booked room ${roomId} from ${start.toLocaleDateString()} to ${end.toLocaleDateString()}`,
+//       type: "booking",
+//       userId: userId,
+//     })
+//     await notification.save()
+
 //     res.status(200).send("Booking saved successfully")
 //   } catch (error) {
 //     console.error("Error saving booking:", error)
@@ -239,6 +277,19 @@
 //     )
 
 //     if (!booking) return res.status(404).send("Booking not found")
+
+//     // Get user details for the notification
+//     const user = await User.findById(req.user.userId)
+
+//     // Create a notification for booking cancellation
+//     const notification = new Notification({
+//       title: "Booking Canceled",
+//       message: `${user.username} has canceled booking for room ${booking.roomId}`,
+//       type: "cancellation",
+//       userId: req.user.userId,
+//     })
+//     await notification.save()
+
 //     res.status(200).send("Booking canceled successfully")
 //   } catch (error) {
 //     console.error("Error canceling booking:", error)
@@ -863,35 +914,82 @@
 //   }
 // })
 
-// // Start Server
-// app.listen(PORT, () => {
+// // Add these notification endpoints
+// app.get("/api/admin/notifications", async (req, res) => {
+//   try {
+//     const notifications = await Notification.find().sort({ time: -1 }).limit(50)
+//     res.status(200).json({ success: true, notifications })
+//   } catch (error) {
+//     console.error("Error fetching notifications:", error)
+//     res.status(500).json({ success: false, message: "Error fetching notifications" })
+//   }
+// })
+
+// app.put("/api/admin/notifications/:id/read", async (req, res) => {
+//   try {
+//     const notification = await Notification.findByIdAndUpdate(req.params.id, { read: true }, { new: true })
+
+//     if (!notification) {
+//       return res.status(404).json({ success: false, message: "Notification not found" })
+//     }
+
+//     res.status(200).json({ success: true, message: "Notification marked as read" })
+//   } catch (error) {
+//     console.error("Error marking notification as read:", error)
+//     res.status(500).json({ success: false, message: "Error marking notification as read" })
+//   }
+// })
+
+// app.put("/api/admin/notifications/read-all", async (req, res) => {
+//   try {
+//     await Notification.updateMany({}, { read: true })
+//     res.status(200).json({ success: true, message: "All notifications marked as read" })
+//   } catch (error) {
+//     console.error("Error marking all notifications as read:", error)
+//     res.status(500).json({ success: false, message: "Error marking all notifications as read" })
+//   }
+// })
+
+// // Add WebSocket support for real-time notifications
+// const http = require("http")
+// const WebSocket = require("ws")
+
+// // Create HTTP server
+// const server = http.createServer(app)
+
+// // Create WebSocket server
+// const wss = new WebSocket.Server({ server })
+
+// // WebSocket connection handler
+// wss.on("connection", (ws) => {
+//   console.log("Client connected")
+
+//   // Handle client disconnection
+//   ws.on("close", () => {
+//     console.log("Client disconnected")
+//   })
+// })
+
+// // Function to broadcast notifications to all connected clients
+// const broadcastNotification = (notification) => {
+//   wss.clients.forEach((client) => {
+//     if (client.readyState === WebSocket.OPEN) {
+//       client.send(JSON.stringify(notification))
+//     }
+//   })
+// }
+
+
+
+// // Modify the server.listen to use the HTTP server
+// server.listen(PORT, () => {
 //   console.log(`Server is running on port ${PORT}`)
 // })
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// // Add a post-save hook to the Notification model to broadcast new notifications
+// notificationSchema.post("save", (doc) => {
+//   broadcastNotification(doc)
+// })
 
 
 
@@ -1391,7 +1489,7 @@ const upload = multer({
 })
 
 // Upload Profile Image Route
-app.post("/api/user/upload-profile-image", authenticateToken, async (req, res) => {
+app.post("/api/user/upload-profile-image", authenticateToken, upload.single("profileImage"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: "No file uploaded" })
@@ -1877,8 +1975,6 @@ const broadcastNotification = (notification) => {
     }
   })
 }
-
-
 
 // Modify the server.listen to use the HTTP server
 server.listen(PORT, () => {
