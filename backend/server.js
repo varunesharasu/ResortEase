@@ -2026,7 +2026,7 @@ app.use(bodyParser.json())
 app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
 // MongoDB Connection
-mongoose.connect("mongodb://localhost:27017/resortBooking", {
+mongoose.connect("mongodb+srv://varunesharasu:varunesh@cluster1.lvoka.mongodb.net/resortBooking", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
