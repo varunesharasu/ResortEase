@@ -492,7 +492,7 @@ const Navbar = () => {
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://resortease-2.onrender.com/api/user', {
+      const response = await fetch('http://localhost:5000/api/user', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -625,7 +625,7 @@ const Navbar = () => {
                   {userProfile && userProfile.profileImage ? (
                     <div className="user-avatar-image">
                       <img 
-                        src={`https://resortease-2.onrender.com${userProfile.profileImage}`} 
+                        src={`http://localhost:5000${userProfile.profileImage}`} 
                         alt={userProfile.username} 
                         className="profile-image"
                       />
@@ -641,7 +641,7 @@ const Navbar = () => {
                     <div className="dropdown-user-info">
                       {userProfile && userProfile.profileImage ? (
                         <img 
-                          src={`https://resortease-2.onrender.com${userProfile.profileImage}`} 
+                          src={`http://localhost:5000${userProfile.profileImage}`} 
                           alt={userProfile.username} 
                           className="dropdown-profile-image"
                         />

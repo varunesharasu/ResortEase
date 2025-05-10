@@ -442,7 +442,7 @@ const About = () => {
       
       try {
         // Send message to server
-        await axios.post("https://resortease-2.onrender.com/api/messages", formData);
+        await axios.post("http://localhost:5000/api/messages", formData);
         
         console.log("Message sent successfully:", formData);
         setFormSubmitted(true);

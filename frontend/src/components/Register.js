@@ -17,7 +17,7 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('https://resortease-2.onrender.com/api/register', {
+      const response = await axios.post('http://localhost:5000/api/register', {
         username,
         email,
         password,
