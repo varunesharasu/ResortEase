@@ -1098,3 +1098,202 @@ section {
     min-height: 400px;
   }
 }
+
+
+
+
+/* Update these styles to make the carousel more responsive */
+
+/* Hero section with carousel - improved responsiveness */
+.hero-section {
+  position: relative;
+  height: 100vh;
+  min-height: 500px;
+  max-height: 800px; /* Limit maximum height for larger screens */
+  overflow: hidden;
+  width: 100%;
+}
+
+.carousel-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.carousel-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ensure proper overlay for all slides */
+.carousel-slide::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6));
+  z-index: 1;
+}
+
+/* Improved video container styling */
+.video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.video-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Ensure carousel content is properly positioned and sized */
+.carousel-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: white;
+  max-width: 800px;
+  padding: 0 2rem;
+  animation: fadeInUp 1s ease-out;
+  width: 100%;
+}
+
+/* Improved responsive typography for carousel */
+.slide-title {
+  font-size: clamp(1.75rem, 5vw, 3.5rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.slide-subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  margin-bottom: 2rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Improved carousel navigation */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  width: clamp(40px, 5vw, 50px);
+  height: clamp(40px, 5vw, 50px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  transition: all var(--transition-normal);
+}
+
+.carousel-arrow:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.carousel-arrow.prev {
+  left: max(10px, 2vw);
+}
+
+.carousel-arrow.next {
+  right: max(10px, 2vw);
+}
+
+/* Improved carousel indicators */
+.carousel-indicators {
+  position: absolute;
+  bottom: max(20px, 4vh);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+.indicator {
+  width: clamp(8px, 1.5vw, 12px);
+  height: clamp(8px, 1.5vw, 12px);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.indicator.active {
+  background: white;
+  transform: scale(1.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .slide-title {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+  }
+
+  .slide-subtitle {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+  }
+
+  .carousel-content {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: 450px;
+  }
+
+  .carousel-arrow {
+    width: 40px;
+    height: 40px;
+  }
+
+  .explore-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    min-height: 400px;
+  }
+
+  .carousel-content {
+    padding: 0 1rem;
+    max-width: 95%;
+  }
+
+  .carousel-indicators {
+    bottom: 15px;
+  }
+
+  .indicator {
+    width: 8px;
+    height: 8px;
+  }
+}
+
