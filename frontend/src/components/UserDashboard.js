@@ -598,31 +598,31 @@
 //                 ) : (
 //                   <motion.div className="profile-card" variants={itemVariants}>
 //                     <div className="profile-header">
-//                     <div className="profile-avatar-container">
-//   <div className="profile-avatar-wrapper">
-//     <div className="profile-avatar" onClick={handleProfileImageClick}>
-//       {getProfileImageUrl() ? (
-//         <img
-//           src={getProfileImageUrl() || "/placeholder.svg"}
-//           alt="Profile"
-//           className="avatar-image"
-//         />
-//       ) : (
-//         userData?.username?.charAt(0) || "U"
-//       )}
-//     </div>
-//     <div className="camera-icon" onClick={handleProfileImageClick}>
-//       <Camera size={16} />
-//     </div>
-//   </div>
-//   <input
-//     type="file"
-//     ref={fileInputRef}
-//     onChange={handleFileChange}
-//     accept="image/*"
-//     className="hidden-file-input"
-//   />
-// </div>
+//                       <div className="profile-avatar-container">
+//                         <div className="profile-avatar-wrapper">
+//                           <div className="profile-avatar" onClick={handleProfileImageClick}>
+//                             {getProfileImageUrl() ? (
+//                               <img
+//                                 src={getProfileImageUrl() || "/placeholder.svg"}
+//                                 alt="Profile"
+//                                 className="avatar-image"
+//                               />
+//                             ) : (
+//                               userData?.username?.charAt(0) || "U"
+//                             )}
+//                             <div className="avatar-overlay">
+//                               <Camera size={20} />
+//                             </div>
+//                           </div>
+//                           <input
+//                             type="file"
+//                             ref={fileInputRef}
+//                             onChange={handleFileChange}
+//                             accept="image/*"
+//                             className="hidden-file-input"
+//                           />
+//                         </div>
+//                       </div>
 //                       <div className="profile-title">
 //                         <h3>
 //                           {userData?.username || "User"}
@@ -1053,6 +1053,11 @@
 
 
 
+
+
+
+
+
 "use client"
 
 import { useEffect, useState, useRef } from "react"
@@ -1077,6 +1082,8 @@ import {
   Settings,
   CreditCard,
   Camera,
+  Home,
+  CalendarDays,
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import "./UserDashboard.css"
@@ -1335,181 +1342,217 @@ const UserDashboard = () => {
   }
 
   const handleDownloadBookingDetails = (booking) => {
-    // Set loading state to true
     setIsGeneratingPdf(true)
     setGeneratingBookingId(booking._id)
 
-    // Use setTimeout to allow the loading animation to render before starting the PDF generation
     setTimeout(() => {
       const doc = new jsPDF()
 
-      // Set document properties with the requested title
+      // Document properties
       doc.setProperties({
-        title: `Royal Castle Farm Stay - Booking CONFIRMATION`,
-        subject: "Hotel Booking Information",
+        title: `Royal Castle Farm Stay - Booking Confirmation`,
+        subject: "Booking Details",
         creator: "Royal Castle Farm Stay",
       })
 
-      // Define colors and styles
-      const primaryColor = [74, 111, 165] // RGB for primary color
-      const secondaryColor = [107, 114, 128] // RGB for text
-      const lightGray = [229, 231, 235] // RGB for light gray
+      // Colors
+      const primaryColor = "#4a6fa5" // Royal blue
+      const secondaryColor = "#555555" // Dark gray
+      const accentColor = "#d4af37" // Gold accent
+      const lightGray = "#f5f5f5"
 
-      // Header section
-      doc.setFillColor(249, 250, 251) // Light background
-      doc.rect(0, 0, 210, 50, "F")
+      // Add watermark background
+      doc.setFillColor(245, 245, 245)
+      doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, "F")
 
-      // Resort Name and Address (Letterhead style)
-      doc.setFont("helvetica", "bold")
-      doc.setFontSize(18)
-      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
-      doc.text("ROYAL CASTLE FARM STAY", 105, 15, { align: "center" })
-
-      // Resort Address
-      doc.setFont("helvetica", "normal")
-      doc.setFontSize(10)
-      doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
-      doc.text("123 Countryside Road, Royal Hills", 105, 22, { align: "center" })
-      doc.text("Tamil Nadu, India - 600001", 105, 27, { align: "center" })
-      doc.text("Phone: +91 98765 43210 | Email: info@royalcastlefarmstay.com", 105, 32, { align: "center" })
-
-      // GST Number
-      doc.setFont("helvetica", "bold")
-      doc.text("GST No: 33DZPPP2781E1Z2", 105, 40, { align: "center" })
-
-      // Removed the "BOOKING CONFIRMATION" title and booking reference
-      // Instead, add the generation date
-      doc.setFont("helvetica", "normal")
-      doc.setFontSize(10)
-      doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
-      doc.text(`Generated on: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, 105, 55, {
-        align: "center",
-      })
-
-      // Horizontal line
-      doc.setDrawColor(lightGray[0], lightGray[1], lightGray[2])
+      // Add decorative border
+      doc.setDrawColor(212, 175, 55) // Gold
       doc.setLineWidth(0.5)
-      doc.line(15, 65, 195, 65)
+      doc.rect(10, 10, 190, 277) // Outer border
 
-      // Guest Information Section - adjusted vertical positions
-      doc.setFont("helvetica", "bold")
-      doc.setFontSize(16)
-      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
-      doc.text("Guest Information", 15, 75)
+      // Header section with logo
+      doc.setFillColor(255, 255, 255)
+      doc.rect(15, 15, 180, 30, "F") // White header background
 
-      doc.setFont("helvetica", "normal")
-      doc.setFontSize(12)
-      doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
+      // Add logo (replace with your actual logo)
+      const logoUrl = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-PkepVGC8W5W3ltJs8KJ7pxkvY6xYPk.png"
+      const img = new Image()
+      img.src = logoUrl
 
-      // If userData is available, use it, otherwise use placeholder
-      if (userData) {
-        doc.text(`Guest Name: ${userData.username}`, 15, 85)
-        doc.text(`Email: ${userData.email}`, 15, 93)
-      } else {
-        doc.text("Guest Name: Registered User", 15, 85)
-        doc.text("Email: Contact hotel for details", 15, 93)
+      img.onload = () => {
+        const imgWidth = 30
+        const imgHeight = (img.height * imgWidth) / img.width
+
+        doc.addImage(img, "PNG", 20, 18, imgWidth, imgHeight)
+
+        // Resort name and address
+        doc.setFont("helvetica", "bold")
+        doc.setFontSize(16)
+        doc.setTextColor(primaryColor)
+        doc.text("ROYAL CASTLE FARM STAY", 60, 25)
+
+        doc.setFont("helvetica", "normal")
+        doc.setFontSize(10)
+        doc.setTextColor(secondaryColor)
+        doc.text("SF.No.328/4, Andipalayam Road, EnneiKadai Karar, Odathurai, Erode, 638455", 60, 30)
+        doc.text("Phone: +91 98765 43210 | Email: info@royalcastlefarmstay.com", 60, 35)
+
+        // Booking confirmation title
+        doc.setFontSize(20)
+        doc.setTextColor(primaryColor)
+        doc.text("BOOKING CONFIRMATION", 105, 55, { align: "center" })
+
+        // Confirmation number
+         doc.setFontSize(12);
+         doc.setTextColor(accentColor);
+         doc.text(`Confirmation #: ${booking._id.substring(0, 8).toUpperCase()}`, 105, 65, { align: "center" });
+
+        // Date issued
+         doc.setTextColor(secondaryColor);
+         doc.text(`Date Issued: ${new Date().toLocaleDateString()}`, 105, 70, { align: "center" });
+
+        // Horizontal divider
+        doc.setDrawColor(212, 175, 55) // Gold
+        doc.setLineWidth(0.3)
+        doc.line(20, 80, 190, 80)
+
+        // Guest Information Section
+        // doc.setFontSize(14);
+        // doc.setTextColor(primaryColor);
+        // doc.text("GUEST INFORMATION", 15, 90);
+
+        doc.setFontSize(11)
+        doc.setTextColor(secondaryColor)
+
+        const guestInfo = [
+          { label: "Guest Name:", value: userData?.username || "Registered User" },
+          { label: "Email:", value: userData?.email || "Contact hotel for details" },
+          { label: "Phone:", value: userData?.phone || "Not provided" },
+        ]
+
+        // Guest info table
+        let guestY = 90
+        guestInfo.forEach((info) => {
+          doc.setFont("helvetica", "bold")
+          doc.text(info.label, 15, guestY)
+          doc.setFont("helvetica", "normal")
+          doc.text(info.value, 45, guestY)
+          guestY += 7
+        })
+
+        // Booking Details Section
+        doc.setFontSize(14)
+        doc.setTextColor(primaryColor)
+        doc.text("BOOKING DETAILS", 15, guestY + 10)
+
+        doc.setFontSize(11)
+        doc.setTextColor(secondaryColor)
+
+        const nights = calculateNights(booking.startDate, booking.endDate)
+        const bookingDetails = [
+          { label: "Room Type:", value: `Room ${booking.roomId}` },
+          { label: "Check-in:", value: `${formatDate(booking.startDate)} at 2:00 PM` },
+          { label: "Check-out:", value: `${formatDate(booking.endDate)} at 12:00 PM` },
+          { label: "Duration:", value: `${nights} night${nights > 1 ? "s" : ""}` },
+          {
+            label: "Guests:",
+            value: `${booking.adults} Adult${booking.adults > 1 ? "s" : ""}, ${booking.children} Child${booking.children !== 1 ? "ren" : ""}`,
+          },
+        ]
+
+        // Booking details table
+        let bookingY = guestY + 20
+        bookingDetails.forEach((detail) => {
+          doc.setFont("helvetica", "bold")
+          doc.text(detail.label, 15, bookingY)
+          doc.setFont("helvetica", "normal")
+          doc.text(detail.value, 45, bookingY)
+          bookingY += 7
+        })
+
+        // Payment Information Section
+        doc.setFontSize(14)
+        doc.setTextColor(primaryColor)
+        doc.text("PAYMENT INFORMATION", 15, bookingY + 10)
+
+        doc.setFontSize(11)
+
+        // Payment table header
+        doc.setFillColor(74, 111, 165) // Primary color
+        doc.rect(15, bookingY + 15, 175, 8, "F")
+        doc.setTextColor(255, 255, 255)
+        doc.text("Description", 20, bookingY + 20)
+        doc.text("Amount", 170, bookingY + 20, { align: "right" })
+
+        // Payment rows
+        doc.setFillColor(255, 255, 255)
+        doc.setTextColor(secondaryColor)
+
+        // Room charge
+        doc.rect(15, bookingY + 23, 175, 8, "F")
+        doc.text(`Room Charge (${nights} night${nights > 1 ? "s" : ""})`, 20, bookingY + 28)
+        doc.text(`₹${booking.totalAmount}`, 170, bookingY + 28, { align: "right" })
+
+        // Total row
+        doc.setFillColor(245, 245, 245)
+        doc.rect(15, bookingY + 31, 175, 10, "F")
+        doc.setFont("helvetica", "bold")
+        doc.text("Total Amount", 20, bookingY + 37)
+        doc.text(`₹${booking.totalAmount}`, 170, bookingY + 37, { align: "right" })
+
+        // Hotel Policies Section
+        doc.setFontSize(14)
+        doc.setTextColor(primaryColor)
+        doc.text("HOTEL POLICIES", 15, bookingY + 50)
+
+        doc.setFontSize(10)
+        doc.setTextColor(secondaryColor)
+
+        const policies = [
+          "• Check-in time: 2:00 PM | Check-out time: 12:00 PM",
+          "• Early check-in/late check-out subject to availability",
+          "• Cancellation: Free cancellation up to 24 hours before check-in",
+          "• No-show policy: Full stay will be charged",
+          "• Pets: Not allowed",
+          "• Smoking: Non-smoking property",
+          "• ID proof required at check-in",
+        ]
+
+        let policyY = bookingY + 60
+        policies.forEach((policy) => {
+          doc.text(policy, 20, policyY)
+          policyY += 6
+        })
+
+        // Footer
+        doc.setFontSize(10)
+        doc.setTextColor(secondaryColor)
+        doc.text("Thank you for choosing Royal Castle Farm Stay. We look forward to welcoming you!", 105, 270, {
+          align: "center",
+        })
+
+        // Confidential notice
+        doc.setFontSize(8)
+        doc.setTextColor(150, 150, 150)
+        doc.text("This document is confidential and intended solely for the addressee", 105, 275, { align: "center" })
+        doc.text("© " + new Date().getFullYear() + " Royal Castle Farm Stay. All rights reserved.", 105, 280, {
+          align: "center",
+        })
+
+        // Save the PDF
+        doc.save(`RoyalCastle_Booking_${booking._id.substring(0, 8)}.pdf`)
+
+        setIsGeneratingPdf(false)
+        setGeneratingBookingId(null)
       }
 
-      // Booking Details Section - adjusted vertical positions
-      doc.setFont("helvetica", "bold")
-      doc.setFontSize(16)
-      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
-      doc.text("Booking Details", 15, 110)
-
-      doc.setFont("helvetica", "normal")
-      doc.setFontSize(12)
-      doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
-
-      const startDate = new Date(booking.startDate).toLocaleDateString()
-      const endDate = new Date(booking.endDate).toLocaleDateString()
-
-      // Calculate number of nights
-      const nights = Math.round((new Date(booking.endDate) - new Date(booking.startDate)) / (1000 * 60 * 60 * 24))
-
-      doc.text(`Room: ${booking.roomId}`, 15, 120)
-      doc.text(`Check-in Date: ${startDate}`, 15, 128)
-      doc.text(`Check-out Date: ${endDate}`, 15, 136)
-      doc.text(`Duration: ${nights} night(s)`, 15, 144)
-      doc.text(`Number of Guests: ${booking.adults} Adult(s), ${booking.children} Child(ren)`, 15, 152)
-
-      // Payment Information Section - adjusted vertical positions
-      doc.setFont("helvetica", "bold")
-      doc.setFontSize(16)
-      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
-      doc.text("Payment Information", 15, 170)
-
-      doc.setFont("helvetica", "normal")
-      doc.setFontSize(12)
-      doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
-
-      // Create a payment table
-      doc.text("Description", 15, 180)
-      doc.text("Amount", 160, 180, { align: "right" })
-
-      // Line under table header
-      doc.setDrawColor(lightGray[0], lightGray[1], lightGray[2])
-      doc.line(15, 182, 195, 182)
-
-      // Table content - you can add more rows as needed
-      doc.text(`Room Charge (${nights} night(s))`, 15, 190)
-      doc.text(`₹${booking.totalAmount}`, 160, 190, { align: "right" })
-
-      // Add taxes (example - modify as needed)
-      const taxRate = 0.18 // 18% GST
-      const taxAmount = (booking.totalAmount * taxRate).toFixed(2)
-      doc.text("Taxes (18% GST)", 15, 198)
-      doc.text(`₹${taxAmount}`, 160, 198, { align: "right" })
-
-      // Total
-      doc.line(15, 202, 195, 202)
-      doc.setFont("helvetica", "bold")
-      doc.text("Total Amount", 15, 210)
-      doc.text(`₹${(Number.parseFloat(booking.totalAmount) + Number.parseFloat(taxAmount)).toFixed(2)}`, 160, 210, {
-        align: "right",
-      })
-
-      // Hotel Policies Section - adjusted vertical positions
-      doc.setFont("helvetica", "bold")
-      doc.setFontSize(16)
-      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
-      doc.text("Hotel Policies", 15, 228)
-
-      doc.setFont("helvetica", "normal")
-      doc.setFontSize(10)
-      doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
-
-      const policies = [
-        "• Check-in time: 2:00 PM, Check-out time: 12:00 PM",
-        "• Cancellation: Free cancellation up to 24 hours before check-in",
-        "• Pets: Not allowed",
-        "• Smoking: Non-smoking rooms",
-      ]
-
-      let yPos = 238
-      policies.forEach((policy) => {
-        doc.text(policy, 15, yPos)
-        yPos += 7
-      })
-
-      // Footer
-      doc.setFillColor(249, 250, 251)
-      doc.rect(0, 270, 210, 27, "F")
-
-      doc.setFont("helvetica", "italic")
-      doc.setFontSize(10)
-      doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
-      doc.text("Thank you for choosing Royal Castle Farm Stay. We look forward to welcoming you!", 105, 280, {
-        align: "center",
-      })
-      doc.text("For any inquiries, please contact our customer service.", 105, 287, { align: "center" })
-
-      // Save the PDF
-      doc.save(`RoyalCastleFarmStay_Booking_${booking._id}.pdf`)
-
-      // Set loading state back to false
-      setIsGeneratingPdf(false)
-      setGeneratingBookingId(null)
-    }, 100) // Small delay to ensure the loading state is rendered
+      img.onerror = () => {
+        // Fallback if image fails to load
+        console.log("Logo failed to load, continuing without it")
+        // Continue with PDF generation without logo
+        // ... [rest of the PDF generation code]
+      }
+    }, 100)
   }
 
   // Format date for display
@@ -1633,7 +1676,7 @@ const UserDashboard = () => {
               >
                 <motion.div className="section-header" variants={itemVariants}>
                   <h2>My Profile</h2>
-                  <p>Manage your personal information</p>
+                  <p>Manage your personal information and account details</p>
                 </motion.div>
 
                 {isLoading ? (
@@ -1654,29 +1697,27 @@ const UserDashboard = () => {
                   <motion.div className="profile-card" variants={itemVariants}>
                     <div className="profile-header">
                       <div className="profile-avatar-container">
-                        <div className="profile-avatar-wrapper">
-                          <div className="profile-avatar" onClick={handleProfileImageClick}>
-                            {getProfileImageUrl() ? (
-                              <img
-                                src={getProfileImageUrl() || "/placeholder.svg"}
-                                alt="Profile"
-                                className="avatar-image"
-                              />
-                            ) : (
-                              userData?.username?.charAt(0) || "U"
-                            )}
-                            <div className="avatar-overlay">
-                              <Camera size={20} />
-                            </div>
+                        <div className="profile-avatar" onClick={handleProfileImageClick}>
+                          {getProfileImageUrl() ? (
+                            <img
+                              src={getProfileImageUrl() || "/placeholder.svg"}
+                              alt="Profile"
+                              className="avatar-image"
+                            />
+                          ) : (
+                            userData?.username?.charAt(0) || "U"
+                          )}
+                          <div className="avatar-overlay">
+                            <Camera size={20} />
                           </div>
-                          <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                            accept="image/*"
-                            className="hidden-file-input"
-                          />
                         </div>
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleFileChange}
+                          accept="image/*"
+                          className="hidden-file-input"
+                        />
                       </div>
                       <div className="profile-title">
                         <h3>
@@ -1688,6 +1729,7 @@ const UserDashboard = () => {
                           )}
                         </h3>
                         <span className="member-since">
+                          <CalendarDays size={14} />
                           Member since {formatDate(userData?.createdAt || new Date())}
                         </span>
                       </div>
@@ -1787,7 +1829,7 @@ const UserDashboard = () => {
               >
                 <motion.div className="section-header" variants={itemVariants}>
                   <h2>My Bookings</h2>
-                  <p>Manage your reservations</p>
+                  <p>View and manage your reservations</p>
                 </motion.div>
 
                 {isLoading ? (
@@ -1807,7 +1849,7 @@ const UserDashboard = () => {
                 ) : (
                   <motion.div className="bookings-card" variants={itemVariants}>
                     <div className="bookings-header">
-                      <h3>Active Reservations</h3>
+                      <h3>Your Reservations</h3>
                       <div className="bookings-filter">
                         <button
                           className={`filter-button ${bookingFilter === "all" ? "active" : ""}`}
@@ -1835,7 +1877,7 @@ const UserDashboard = () => {
                         <div className="empty-icon">
                           <Calendar size={48} />
                         </div>
-                        <h4>No {bookingFilter !== "all" ? bookingFilter : "active"} Bookings</h4>
+                        <h4>No {bookingFilter !== "all" ? bookingFilter : ""} Bookings Found</h4>
                         <p>
                           You don't have any {bookingFilter !== "all" ? bookingFilter : "active"} reservations at the
                           moment.
@@ -1846,7 +1888,8 @@ const UserDashboard = () => {
                           whileTap={{ scale: 0.95 }}
                           onClick={() => navigate("/rooms")}
                         >
-                          Book a Room
+                          <Home size={18} />
+                          <span>Book a Room</span>
                         </motion.button>
                       </div>
                     ) : (
@@ -2080,15 +2123,15 @@ const UserDashboard = () => {
 
               <div className="pdf-steps">
                 <div className="pdf-step active">
-                  <div className="step-indicator"></div>
+                  <div className="step-indicator">1</div>
                   <span>Collecting data</span>
                 </div>
                 <div className="pdf-step">
-                  <div className="step-indicator"></div>
+                  <div className="step-indicator">2</div>
                   <span>Formatting document</span>
                 </div>
                 <div className="pdf-step">
-                  <div className="step-indicator"></div>
+                  <div className="step-indicator">3</div>
                   <span>Finalizing PDF</span>
                 </div>
               </div>
