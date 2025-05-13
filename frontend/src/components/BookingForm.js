@@ -26,7 +26,7 @@ const BookingForm = () => {
   useEffect(() => {
     const fetchBookedDates = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/bookings/${roomId}`)
+        const response = await axios.get(`https://resortease-2.onrender.com/api/bookings/${roomId}`)
         const intervals = response.data.map((booking) => ({
           start: new Date(booking.startDate),
           end: new Date(booking.endDate),
@@ -131,7 +131,7 @@ const BookingForm = () => {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/book",
+        "https://resortease-2.onrender.com/api/book",
         {
           roomId,
           startDate: startDate.toISOString().split("T")[0],

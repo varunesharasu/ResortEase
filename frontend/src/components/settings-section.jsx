@@ -46,7 +46,7 @@ const SettingsSection = ({ userData, navigate }) => {
       const token = localStorage.getItem("token")
 
       await axios.post(
-        "http://localhost:5000/api/user/change-password",
+        "https://resortease-2.onrender.com/api/user/change-password",
         {
           currentPassword,
           newPassword,
@@ -84,7 +84,7 @@ const SettingsSection = ({ userData, navigate }) => {
       setIsDeleting(true)
       const token = localStorage.getItem("token")
 
-      await axios.delete("http://localhost:5000/api/user/delete-account", {
+      await axios.delete("https://resortease-2.onrender.com/api/user/delete-account", {
         headers: { Authorization: `Bearer ${token}` },
       })
 

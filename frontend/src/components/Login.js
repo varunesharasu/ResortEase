@@ -24,7 +24,7 @@
 //     setIsLoading(true)
 
 //     try {
-//       const response = await axios.post("http://localhost:5000/api/login", {
+//       const response = await axios.post("https://resortease-2.onrender.com/api/login", {
 //         email,
 //         password,
 //       })
@@ -50,7 +50,7 @@
 
 //     setIsLoading(true)
 //     try {
-//       const response = await axios.post("http://localhost:5000/api/forgot-password", {
+//       const response = await axios.post("https://resortease-2.onrender.com/api/forgot-password", {
 //         email,
 //       })
 
@@ -71,7 +71,7 @@
 
 //     setIsLoading(true)
 //     try {
-//       const response = await axios.post("http://localhost:5000/api/verify-reset-pin", {
+//       const response = await axios.post("https://resortease-2.onrender.com/api/verify-reset-pin", {
 //         email,
 //         pin,
 //       })
@@ -99,7 +99,7 @@
 
 //     setIsLoading(true)
 //     try {
-//       const response = await axios.post("http://localhost:5000/api/reset-password", {
+//       const response = await axios.post("https://resortease-2.onrender.com/api/reset-password", {
 //         tempToken,
 //         newPassword,
 //       })
@@ -883,7 +883,7 @@ const Login = () => {
     setIsLoading(true)
 
     try {
-      const response = await axios.post("http://localhost:5000/api/login", {
+      const response = await axios.post("https://resortease-2.onrender.com/api/login", {
         email,
         password,
       })
@@ -909,7 +909,7 @@ const Login = () => {
 
     setIsLoading(true)
     try {
-      const response = await axios.post("http://localhost:5000/api/forgot-password", {
+      const response = await axios.post("https://resortease-2.onrender.com/api/forgot-password", {
         email,
       })
 
@@ -930,7 +930,7 @@ const Login = () => {
 
     setIsLoading(true)
     try {
-      const response = await axios.post("http://localhost:5000/api/verify-reset-pin", {
+      const response = await axios.post("https://resortease-2.onrender.com/api/verify-reset-pin", {
         email,
         pin,
       })
@@ -958,7 +958,7 @@ const Login = () => {
 
     setIsLoading(true)
     try {
-      const response = await axios.post("http://localhost:5000/api/reset-password", {
+      const response = await axios.post("https://resortease-2.onrender.com/api/reset-password", {
         tempToken,
         newPassword,
       })

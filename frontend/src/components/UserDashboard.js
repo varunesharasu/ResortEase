@@ -61,7 +61,7 @@ const UserDashboard = () => {
         }
 
         // Fetch all bookings instead of just active ones
-        const response = await axios.get("http://localhost:5000/api/user", {
+        const response = await axios.get("https://resortease-2.onrender.com/api/user", {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -113,12 +113,12 @@ const UserDashboard = () => {
       }
 
       const token = localStorage.getItem("token")
-      await axios.delete(`http://localhost:5000/api/bookings/${bookingId}`, {
+      await axios.delete(`https://resortease-2.onrender.com/api/bookings/${bookingId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
 
       // Refetch data to update UI
-      const response = await axios.get("http://localhost:5000/api/user", {
+      const response = await axios.get("https://resortease-2.onrender.com/api/user", {
         headers: { Authorization: `Bearer ${token}` },
       })
       setUserData(response.data.user)
@@ -153,7 +153,7 @@ const UserDashboard = () => {
     try {
       const token = localStorage.getItem("token")
       await axios.put(
-        "http://localhost:5000/api/user/update",
+        "https://resortease-2.onrender.com/api/user/update",
         {
           username: updatedUserData.username,
           phone: updatedUserData.phone,
@@ -165,7 +165,7 @@ const UserDashboard = () => {
       )
 
       // Refetch updated user data
-      const response = await axios.get("http://localhost:5000/api/user", {
+      const response = await axios.get("https://resortease-2.onrender.com/api/user", {
         headers: { Authorization: `Bearer ${token}` },
       })
       setUserData(response.data.user)
@@ -216,7 +216,7 @@ const UserDashboard = () => {
       const formData = new FormData()
       formData.append("profileImage", file)
 
-      await axios.post("http://localhost:5000/api/user/upload-profile-image", formData, {
+      await axios.post("https://resortease-2.onrender.com/api/user/upload-profile-image", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -224,7 +224,7 @@ const UserDashboard = () => {
       })
 
       // Update user data with new profile image
-      const updatedUserResponse = await axios.get("http://localhost:5000/api/user", {
+      const updatedUserResponse = await axios.get("https://resortease-2.onrender.com/api/user", {
         headers: { Authorization: `Bearer ${token}` },
       })
 
@@ -555,7 +555,7 @@ const UserDashboard = () => {
       return imagePreview
     } else if (userData?.profileImage) {
       // Use the full URL with the server address
-      return `http://localhost:5000${userData.profileImage}`
+      return `https://resortease-2.onrender.com${userData.profileImage}`
     }
     return null
   }
