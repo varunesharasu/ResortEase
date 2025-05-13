@@ -555,7 +555,7 @@ const UserDashboard = () => {
       return imagePreview
     } else if (userData?.profileImage) {
       // Use the full URL with the server address
-      return `https://resortease-2.onrender.com${userData.profileImage}`
+      return `https://resortease-2.onrender.com/${userData.profileImage}`
     }
     return null
   }

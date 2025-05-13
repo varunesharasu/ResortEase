@@ -1006,7 +1006,9 @@ const Login = () => {
                       const newEmail = e.target.value
                       setEmail(newEmail)
                       // Check if it's a valid Gmail address
-                      const isGmail = /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(newEmail)
+                      // const isGmail = /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(newEmail)
+                      const isGmail = /^[a-zA-Z0-9._%+-]+@(gmail\.com|kongu\.edu)$/.test(newEmail);
+
                       setIsValidGmail(isGmail)
                     }}
                     required
