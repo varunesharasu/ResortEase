@@ -1,9 +1,6 @@
-
 "use client"
 
 import { useEffect, useState, useRef } from "react"
-import axios from "axios"
-import { useNavigate } from "react-router-dom"
 import { jsPDF } from "jspdf"
 import {
   User,
@@ -25,13 +22,13 @@ import {
   Camera,
   Home,
   CalendarDays,
+  Menu,
+  Bell,
+  LogOut,
 } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import "./UserDashboard.css"
-import SettingsSection from "./settings-section"
+import "./user-dashboard.css"
 
 const UserDashboard = () => {
-  const navigate = useNavigate()
   const [userData, setUserData] = useState(null)
   const [bookings, setBookings] = useState([])
   const [isEditing, setIsEditing] = useState(false)
@@ -49,41 +46,72 @@ const UserDashboard = () => {
   const fileInputRef = useRef(null)
   const [bookingFilter, setBookingFilter] = useState("all")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [notifications, setNotifications] = useState([])
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         setIsLoading(true)
-        const token = localStorage.getItem("token")
-        if (!token) {
-          navigate("/login")
-          return
-        }
+        // Simulate API call
+        setTimeout(() => {
+          const mockUser = {
+            _id: "user123",
+            username: "John Doe",
+            email: "john.doe@example.com",
+            phone: "+1 (555) 123-4567",
+            dob: "1990-01-15",
+            createdAt: "2023-01-01",
+            isVerified: true,
+            profileImage: null,
+            lastLogin: "2023-06-15",
+          }
 
-        // Fetch all bookings instead of just active ones
-        const response = await axios.get("https://resortease-2.onrender.com/api/user", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+          const mockBookings = [
+            {
+              _id: "booking1234567",
+              roomId: "Deluxe Suite",
+              startDate: "2023-07-20",
+              endDate: "2023-07-25",
+              adults: 2,
+              children: 1,
+              totalAmount: 25000,
+              status: "active",
+            },
+            {
+              _id: "booking7654321",
+              roomId: "Premium Villa",
+              startDate: "2023-08-15",
+              endDate: "2023-08-20",
+              adults: 4,
+              children: 2,
+              totalAmount: 45000,
+              status: "active",
+            },
+            {
+              _id: "booking9876543",
+              roomId: "Garden View",
+              startDate: "2023-05-10",
+              endDate: "2023-05-12",
+              adults: 2,
+              children: 0,
+              totalAmount: 12000,
+              status: "completed",
+            },
+          ]
 
-        // Get all bookings
-        const allBookings = response.data.bookings
-
-        // Sort bookings by startDate (latest first)
-        allBookings.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
-
-        setUserData(response.data.user)
-        setBookings(allBookings)
-        setIsLoading(false)
+          setUserData(mockUser)
+          setBookings(mockBookings)
+          setIsLoading(false)
+        }, 1500)
       } catch (error) {
         console.error("Error fetching user data:", error)
-        navigate("/login")
+        setIsLoading(false)
       }
     }
 
     fetchUserData()
-  }, [navigate])
+  }, [])
 
-  // Update the handleCancelBooking function to check if the booking has already started
   const handleCancelBooking = async (bookingId) => {
     try {
       // Find the booking to check cancellation eligibility
@@ -112,20 +140,12 @@ const UserDashboard = () => {
         return
       }
 
-      const token = localStorage.getItem("token")
-      await axios.delete(`https://resortease-2.onrender.com/api/bookings/${bookingId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-
-      // Refetch data to update UI
-      const response = await axios.get("https://resortease-2.onrender.com/api/user", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      setUserData(response.data.user)
-      setBookings(response.data.bookings.filter((b) => b.status === "active"))
-
-      // Show success notification
-      showNotification("Booking canceled successfully", "success")
+      // Simulate API call
+      setTimeout(() => {
+        const updatedBookings = bookings.filter((b) => b._id !== bookingId)
+        setBookings(updatedBookings)
+        showNotification("Booking canceled successfully", "success")
+      }, 1000)
     } catch (error) {
       console.error("Error canceling booking:", error)
       showNotification("Failed to cancel booking", "error")
@@ -151,26 +171,17 @@ const UserDashboard = () => {
 
   const handleUpdateUserDetails = async () => {
     try {
-      const token = localStorage.getItem("token")
-      await axios.put(
-        "https://resortease-2.onrender.com/api/user/update",
-        {
+      // Simulate API call
+      setTimeout(() => {
+        setUserData({
+          ...userData,
           username: updatedUserData.username,
           phone: updatedUserData.phone,
           dob: updatedUserData.dob,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      )
-
-      // Refetch updated user data
-      const response = await axios.get("https://resortease-2.onrender.com/api/user", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      setUserData(response.data.user)
-      setIsEditing(false)
-      showNotification("User details updated successfully", "success")
+        })
+        setIsEditing(false)
+        showNotification("User details updated successfully", "success")
+      }, 1000)
     } catch (error) {
       console.error("Error updating user details:", error)
       showNotification("Failed to update user details", "error")
@@ -211,26 +222,20 @@ const UserDashboard = () => {
   const handleUploadImage = async (file) => {
     try {
       setIsUploadingImage(true)
-      const token = localStorage.getItem("token")
 
-      const formData = new FormData()
-      formData.append("profileImage", file)
-
-      await axios.post("https://resortease-2.onrender.com/api/user/upload-profile-image", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      })
-
-      // Update user data with new profile image
-      const updatedUserResponse = await axios.get("https://resortease-2.onrender.com/api/user", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-
-      setUserData(updatedUserResponse.data.user)
-      setIsUploadingImage(false)
-      showNotification("Profile image updated successfully", "success")
+      // Simulate API call
+      setTimeout(() => {
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setUserData({
+            ...userData,
+            profileImage: reader.result,
+          })
+          setIsUploadingImage(false)
+          showNotification("Profile image updated successfully", "success")
+        }
+        reader.readAsDataURL(file)
+      }, 1500)
     } catch (error) {
       console.error("Error uploading profile image:", error)
       setIsUploadingImage(false)
@@ -239,37 +244,18 @@ const UserDashboard = () => {
   }
 
   const showNotification = (message, type) => {
-    const notification = document.createElement("div")
-    notification.className = `notification ${type}`
-    notification.innerHTML = `
-      <div class="notification-content">
-        <span>${message}</span>
-        <button class="notification-close">×</button>
-      </div>
-    `
-    document.body.appendChild(notification)
+    const newNotification = {
+      id: Date.now(),
+      message,
+      type,
+    }
 
-    // Add the 'show' class after a small delay to trigger the animation
-    setTimeout(() => {
-      notification.classList.add("show")
-    }, 10)
+    setNotifications((prev) => [...prev, newNotification])
 
     // Remove notification after 3 seconds
     setTimeout(() => {
-      notification.classList.remove("show")
-      setTimeout(() => {
-        document.body.removeChild(notification)
-      }, 300)
+      setNotifications((prev) => prev.filter((n) => n.id !== newNotification.id))
     }, 3000)
-
-    // Close button functionality
-    const closeButton = notification.querySelector(".notification-close")
-    closeButton.addEventListener("click", () => {
-      notification.classList.remove("show")
-      setTimeout(() => {
-        document.body.removeChild(notification)
-      }, 300)
-    })
   }
 
   const openEditModal = () => {
@@ -316,192 +302,168 @@ const UserDashboard = () => {
       doc.setFillColor(255, 255, 255)
       doc.rect(15, 15, 180, 30, "F") // White header background
 
-      // Add logo (replace with your actual logo)
-      const logoUrl = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-PkepVGC8W5W3ltJs8KJ7pxkvY6xYPk.png"
-      const img = new Image()
-      img.src = logoUrl
+      // Resort name and address
+      doc.setFont("helvetica", "bold")
+      doc.setFontSize(16)
+      doc.setTextColor(primaryColor)
+      doc.text("ROYAL CASTLE FARM STAY", 60, 25)
 
-      img.onload = () => {
-        const imgWidth = 30
-        const imgHeight = (img.height * imgWidth) / img.width
+      doc.setFont("helvetica", "normal")
+      doc.setFontSize(10)
+      doc.setTextColor(secondaryColor)
+      doc.text("SF.No.328/4, Andipalayam Road, EnneiKadai Karar, Odathurai, Erode, 638455", 60, 30)
+      doc.text("Phone: +91 98765 43210 | Email: info@royalcastlefarmstay.com", 60, 35)
 
-        doc.addImage(img, "PNG", 20, 18, imgWidth, imgHeight)
+      // Booking confirmation title
+      doc.setFontSize(20)
+      doc.setTextColor(primaryColor)
+      doc.text("BOOKING CONFIRMATION", 105, 55, { align: "center" })
 
-        // Resort name and address
+      // Confirmation number
+      doc.setFontSize(12)
+      doc.setTextColor(accentColor)
+      doc.text(`Confirmation #: ${booking._id.substring(0, 8).toUpperCase()}`, 105, 65, { align: "center" })
+
+      // Date issued
+      doc.setTextColor(secondaryColor)
+      doc.text(`Date Issued: ${new Date().toLocaleDateString()}`, 105, 70, { align: "center" })
+
+      // Horizontal divider
+      doc.setDrawColor(212, 175, 55) // Gold
+      doc.setLineWidth(0.3)
+      doc.line(20, 80, 190, 80)
+
+      doc.setFontSize(11)
+      doc.setTextColor(secondaryColor)
+
+      const guestInfo = [
+        { label: "Guest Name:", value: userData?.username || "Registered User" },
+        { label: "Email:", value: userData?.email || "Contact hotel for details" },
+        { label: "Phone:", value: userData?.phone || "Not provided" },
+      ]
+
+      // Guest info table
+      let guestY = 90
+      guestInfo.forEach((info) => {
         doc.setFont("helvetica", "bold")
-        doc.setFontSize(16)
-        doc.setTextColor(primaryColor)
-        doc.text("ROYAL CASTLE FARM STAY", 60, 25)
-
+        doc.text(info.label, 15, guestY)
         doc.setFont("helvetica", "normal")
-        doc.setFontSize(10)
-        doc.setTextColor(secondaryColor)
-        doc.text("SF.No.328/4, Andipalayam Road, EnneiKadai Karar, Odathurai, Erode, 638455", 60, 30)
-        doc.text("Phone: +91 98765 43210 | Email: info@royalcastlefarmstay.com", 60, 35)
+        doc.text(info.value, 45, guestY)
+        guestY += 7
+      })
 
-        // Booking confirmation title
-        doc.setFontSize(20)
-        doc.setTextColor(primaryColor)
-        doc.text("BOOKING CONFIRMATION", 105, 55, { align: "center" })
+      // Booking Details Section
+      doc.setFontSize(14)
+      doc.setTextColor(primaryColor)
+      doc.text("BOOKING DETAILS", 15, guestY + 10)
 
-        // Confirmation number
-         doc.setFontSize(12);
-         doc.setTextColor(accentColor);
-         doc.text(`Confirmation #: ${booking._id.substring(0, 8).toUpperCase()}`, 105, 65, { align: "center" });
+      doc.setFontSize(11)
+      doc.setTextColor(secondaryColor)
 
-        // Date issued
-         doc.setTextColor(secondaryColor);
-         doc.text(`Date Issued: ${new Date().toLocaleDateString()}`, 105, 70, { align: "center" });
+      const nights = calculateNights(booking.startDate, booking.endDate)
+      const bookingDetails = [
+        { label: "Room Type:", value: `${booking.roomId}` },
+        { label: "Check-in:", value: `${formatDate(booking.startDate)} at 2:00 PM` },
+        { label: "Check-out:", value: `${formatDate(booking.endDate)} at 12:00 PM` },
+        { label: "Duration:", value: `${nights} night${nights > 1 ? "s" : ""}` },
+        {
+          label: "Guests:",
+          value: `${booking.adults} Adult${booking.adults > 1 ? "s" : ""}, ${booking.children} Child${booking.children !== 1 ? "ren" : ""}`,
+        },
+      ]
 
-        // Horizontal divider
-        doc.setDrawColor(212, 175, 55) // Gold
-        doc.setLineWidth(0.3)
-        doc.line(20, 80, 190, 80)
-
-        // Guest Information Section
-        // doc.setFontSize(14);
-        // doc.setTextColor(primaryColor);
-        // doc.text("GUEST INFORMATION", 15, 90);
-
-        doc.setFontSize(11)
-        doc.setTextColor(secondaryColor)
-
-        const guestInfo = [
-          { label: "Guest Name:", value: userData?.username || "Registered User" },
-          { label: "Email:", value: userData?.email || "Contact hotel for details" },
-          { label: "Phone:", value: userData?.phone || "Not provided" },
-        ]
-
-        // Guest info table
-        let guestY = 90
-        guestInfo.forEach((info) => {
-          doc.setFont("helvetica", "bold")
-          doc.text(info.label, 15, guestY)
-          doc.setFont("helvetica", "normal")
-          doc.text(info.value, 45, guestY)
-          guestY += 7
-        })
-
-        // Booking Details Section
-        doc.setFontSize(14)
-        doc.setTextColor(primaryColor)
-        doc.text("BOOKING DETAILS", 15, guestY + 10)
-
-        doc.setFontSize(11)
-        doc.setTextColor(secondaryColor)
-
-        const nights = calculateNights(booking.startDate, booking.endDate)
-        const bookingDetails = [
-          { label: "Room Type:", value: `Room ${booking.roomId}` },
-          { label: "Check-in:", value: `${formatDate(booking.startDate)} at 2:00 PM` },
-          { label: "Check-out:", value: `${formatDate(booking.endDate)} at 12:00 PM` },
-          { label: "Duration:", value: `${nights} night${nights > 1 ? "s" : ""}` },
-          {
-            label: "Guests:",
-            value: `${booking.adults} Adult${booking.adults > 1 ? "s" : ""}, ${booking.children} Child${booking.children !== 1 ? "ren" : ""}`,
-          },
-        ]
-
-        // Booking details table
-        let bookingY = guestY + 20
-        bookingDetails.forEach((detail) => {
-          doc.setFont("helvetica", "bold")
-          doc.text(detail.label, 15, bookingY)
-          doc.setFont("helvetica", "normal")
-          doc.text(detail.value, 45, bookingY)
-          bookingY += 7
-        })
-
-        // Payment Information Section
-        doc.setFontSize(14)
-        doc.setTextColor(primaryColor)
-        doc.text("PAYMENT INFORMATION", 15, bookingY + 10)
-
-        doc.setFontSize(11)
-
-        // Payment table header
-        doc.setFillColor(74, 111, 165) // Primary color
-        doc.rect(15, bookingY + 15, 175, 8, "F")
-        doc.setTextColor(255, 255, 255)
-        doc.text("Description", 20, bookingY + 20)
-        doc.text("Amount", 170, bookingY + 20, { align: "right" })
-
-        // Payment rows
-        doc.setFillColor(255, 255, 255)
-        doc.setTextColor(secondaryColor)
-
-        // Room charge
-        doc.rect(15, bookingY + 23, 175, 8, "F")
-        doc.text(`Room Charge (${nights} night${nights > 1 ? "s" : ""})`, 20, bookingY + 28)
-        doc.text(`₹${booking.totalAmount}`, 170, bookingY + 28, { align: "right" })
-
-        // Total row
-        doc.setFillColor(245, 245, 245)
-        doc.rect(15, bookingY + 31, 175, 10, "F")
+      // Booking details table
+      let bookingY = guestY + 20
+      bookingDetails.forEach((detail) => {
         doc.setFont("helvetica", "bold")
-        doc.text("Total Amount", 20, bookingY + 37)
-        doc.text(`₹${booking.totalAmount}`, 170, bookingY + 37, { align: "right" })
+        doc.text(detail.label, 15, bookingY)
+        doc.setFont("helvetica", "normal")
+        doc.text(detail.value, 45, bookingY)
+        bookingY += 7
+      })
 
-        // Hotel Policies Section
-        doc.setFontSize(14)
-        doc.setTextColor(primaryColor)
-        doc.text("HOTEL POLICIES", 15, bookingY + 50)
+      // Payment Information Section
+      doc.setFontSize(14)
+      doc.setTextColor(primaryColor)
+      doc.text("PAYMENT INFORMATION", 15, bookingY + 10)
 
-        doc.setFontSize(10)
-        doc.setTextColor(secondaryColor)
+      doc.setFontSize(11)
 
-        const policies = [
-          "• Check-in time: 2:00 PM | Check-out time: 12:00 PM",
-          "• Early check-in/late check-out subject to availability",
-          "• Cancellation: Free cancellation up to 24 hours before check-in",
-          "• No-show policy: Full stay will be charged",
-          "• Pets: Not allowed",
-          "• Smoking: Non-smoking property",
-          "• ID proof required at check-in",
-        ]
+      // Payment table header
+      doc.setFillColor(74, 111, 165) // Primary color
+      doc.rect(15, bookingY + 15, 175, 8, "F")
+      doc.setTextColor(255, 255, 255)
+      doc.text("Description", 20, bookingY + 20)
+      doc.text("Amount", 170, bookingY + 20, { align: "right" })
 
-        let policyY = bookingY + 60
-        policies.forEach((policy) => {
-          doc.text(policy, 20, policyY)
-          policyY += 6
-        })
+      // Payment rows
+      doc.setFillColor(255, 255, 255)
+      doc.setTextColor(secondaryColor)
 
-        // Footer
-        doc.setFontSize(10)
-        doc.setTextColor(secondaryColor)
-        doc.text("Thank you for choosing Royal Castle Farm Stay. We look forward to welcoming you!", 105, 270, {
-          align: "center",
-        })
+      // Room charge
+      doc.rect(15, bookingY + 23, 175, 8, "F")
+      doc.text(`Room Charge (${nights} night${nights > 1 ? "s" : ""})`, 20, bookingY + 28)
+      doc.text(`₹${booking.totalAmount}`, 170, bookingY + 28, { align: "right" })
 
-        // Confidential notice
-        doc.setFontSize(8)
-        doc.setTextColor(150, 150, 150)
-        doc.text("This document is confidential and intended solely for the addressee", 105, 275, { align: "center" })
-        doc.text("© " + new Date().getFullYear() + " Royal Castle Farm Stay. All rights reserved.", 105, 280, {
-          align: "center",
-        })
+      // Total row
+      doc.setFillColor(245, 245, 245)
+      doc.rect(15, bookingY + 31, 175, 10, "F")
+      doc.setFont("helvetica", "bold")
+      doc.text("Total Amount", 20, bookingY + 37)
+      doc.text(`₹${booking.totalAmount}`, 170, bookingY + 37, { align: "right" })
 
-        // Save the PDF
-        doc.save(`RoyalCastle_Booking_${booking._id.substring(0, 8)}.pdf`)
+      // Hotel Policies Section
+      doc.setFontSize(14)
+      doc.setTextColor(primaryColor)
+      doc.text("HOTEL POLICIES", 15, bookingY + 50)
 
-        setIsGeneratingPdf(false)
-        setGeneratingBookingId(null)
-      }
+      doc.setFontSize(10)
+      doc.setTextColor(secondaryColor)
 
-      img.onerror = () => {
-        // Fallback if image fails to load
-        console.log("Logo failed to load, continuing without it")
-        // Continue with PDF generation without logo
-        // ... [rest of the PDF generation code]
-      }
-    }, 100)
+      const policies = [
+        "• Check-in time: 2:00 PM | Check-out time: 12:00 PM",
+        "• Early check-in/late check-out subject to availability",
+        "• Cancellation: Free cancellation up to 24 hours before check-in",
+        "• No-show policy: Full stay will be charged",
+        "• Pets: Not allowed",
+        "• Smoking: Non-smoking property",
+        "• ID proof required at check-in",
+      ]
+
+      let policyY = bookingY + 60
+      policies.forEach((policy) => {
+        doc.text(policy, 20, policyY)
+        policyY += 6
+      })
+
+      // Footer
+      doc.setFontSize(10)
+      doc.setTextColor(secondaryColor)
+      doc.text("Thank you for choosing Royal Castle Farm Stay. We look forward to welcoming you!", 105, 270, {
+        align: "center",
+      })
+
+      // Confidential notice
+      doc.setFontSize(8)
+      doc.setTextColor(150, 150, 150)
+      doc.text("This document is confidential and intended solely for the addressee", 105, 275, { align: "center" })
+      doc.text("© " + new Date().getFullYear() + " Royal Castle Farm Stay. All rights reserved.", 105, 280, {
+        align: "center",
+      })
+
+      // Save the PDF
+      doc.save(`RoyalCastle_Booking_${booking._id.substring(0, 8)}.pdf`)
+
+      setIsGeneratingPdf(false)
+      setGeneratingBookingId(null)
+    }, 2000)
   }
 
   // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return ""
     const date = new Date(dateString)
-    return date.toLocaleDateString()
+    return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
   }
 
   // Calculate nights between two dates
@@ -523,575 +485,741 @@ const UserDashboard = () => {
     }
   }
 
-  // Skeleton loader component
-  const Skeleton = ({ className }) => {
-    return <div className={`skeleton ${className}`}></div>
-  }
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { type: "spring", stiffness: 100, damping: 15 },
-    },
-  }
-
   // Get profile image URL
   const getProfileImageUrl = () => {
     if (imagePreview) {
       return imagePreview
     } else if (userData?.profileImage) {
-      // Use the full URL with the server address
-      return `https://resortease-2.onrender.com/${userData.profileImage}`
+      return userData.profileImage
     }
     return null
   }
 
+  // Skeleton loader component
+  const Skeleton = ({ className }) => {
+    return <div className={`skeleton ${className}`}></div>
+  }
+
+  // Settings section component
+  const SettingsSection = () => {
+    return (
+      <div className="settings-section">
+        <div className="section-header">
+          <h2>Account Settings</h2>
+          <p>Manage your account preferences and settings</p>
+        </div>
+
+        <div className="settings-card">
+          <div className="settings-group">
+            <h4>Notification Preferences</h4>
+            <div className="settings-options">
+              <div className="settings-option">
+                <div className="option-label">
+                  <span>Email Notifications</span>
+                  <p className="option-description">Receive booking confirmations and updates via email</p>
+                </div>
+                <label className="toggle">
+                  <input type="checkbox" defaultChecked />
+                  <span className="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div className="settings-option">
+                <div className="option-label">
+                  <span>SMS Notifications</span>
+                  <p className="option-description">Receive booking alerts and reminders via SMS</p>
+                </div>
+                <label className="toggle">
+                  <input type="checkbox" defaultChecked />
+                  <span className="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div className="settings-option">
+                <div className="option-label">
+                  <span>Marketing Communications</span>
+                  <p className="option-description">Receive special offers and promotions</p>
+                </div>
+                <label className="toggle">
+                  <input type="checkbox" />
+                  <span className="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="settings-group">
+            <h4>Security Settings</h4>
+            <div className="settings-options">
+              <div className="settings-option">
+                <div className="option-label">
+                  <span>Change Password</span>
+                  <p className="option-description">Update your account password</p>
+                </div>
+                <button className="settings-action-button">Change</button>
+              </div>
+
+              <div className="settings-option">
+                <div className="option-label">
+                  <span>Two-Factor Authentication</span>
+                  <p className="option-description">Add an extra layer of security to your account</p>
+                </div>
+                <label className="toggle">
+                  <input type="checkbox" />
+                  <span className="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="settings-group">
+            <h4>Account Management</h4>
+            <div className="settings-options">
+              <div className="settings-option">
+                <div className="option-label">
+                  <span>Delete Account</span>
+                  <p className="option-description">Permanently delete your account and all data</p>
+                </div>
+                <button className="settings-action-button danger">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Payments section component
+  const PaymentsSection = () => {
+    return (
+      <div className="payments-section">
+        <div className="section-header">
+          <h2>Payment History</h2>
+          <p>View your payment history and manage payment methods</p>
+        </div>
+
+        <div className="payments-card">
+          <div className="payments-header">
+            <h3>Payment Methods</h3>
+            <button className="add-payment-button">
+              <span>Add Payment Method</span>
+            </button>
+          </div>
+
+          <div className="payment-methods">
+            <div className="payment-method">
+              <div className="payment-method-icon visa"></div>
+              <div className="payment-method-details">
+                <h4>Visa ending in 4242</h4>
+                <p>Expires 12/2025</p>
+              </div>
+              <div className="payment-method-actions">
+                <span className="payment-method-default">Default</span>
+                <button className="payment-method-edit">Edit</button>
+              </div>
+            </div>
+
+            <div className="payment-method">
+              <div className="payment-method-icon mastercard"></div>
+              <div className="payment-method-details">
+                <h4>Mastercard ending in 8888</h4>
+                <p>Expires 08/2024</p>
+              </div>
+              <div className="payment-method-actions">
+                <button className="payment-method-make-default">Make Default</button>
+                <button className="payment-method-edit">Edit</button>
+              </div>
+            </div>
+          </div>
+
+          <div className="payments-history">
+            <h3>Recent Transactions</h3>
+
+            <div className="transactions-list">
+              {bookings.map((booking) => (
+                <div className="transaction-item" key={booking._id}>
+                  <div className="transaction-icon">
+                    <CheckCircle size={20} />
+                  </div>
+                  <div className="transaction-details">
+                    <h4>Payment for {booking.roomId}</h4>
+                    <p>Booking #{booking._id.substring(0, 8)}</p>
+                    <span className="transaction-date">{formatDate(booking.startDate)}</span>
+                  </div>
+                  <div className="transaction-amount">
+                    <span>₹{booking.totalAmount}</span>
+                    <span className="transaction-status success">Successful</span>
+                  </div>
+                </div>
+              ))}
+
+              {bookings.length === 0 && (
+                <div className="empty-transactions">
+                  <p>No transaction history available</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="dashboard-container">
+      {/* Mobile Header */}
       <div className="mobile-header">
-    <button 
-      className="mobile-menu-toggle"
-      onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-    >
-      ☰
-    </button>
-    <div className="mobile-logo">Royal Castle</div>
-  </div>
-      <div className="dashboard-sidebar">
+        <button
+          className="mobile-menu-toggle"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          <Menu size={24} />
+        </button>
+        <div className="mobile-logo">Royal Castle</div>
+        <div className="mobile-actions">
+          <button className="mobile-action-button" aria-label="Notifications">
+            <Bell size={20} />
+          </button>
+        </div>
+      </div>
+
+      {/* Sidebar */}
+      <div className={`dashboard-sidebar ${isMobileMenuOpen ? "open" : ""}`}>
         <div className="sidebar-header">
           <div className="logo">
             <span className="logo-text">Royal Castle</span>
           </div>
+          <button className="sidebar-close-button" onClick={() => setIsMobileMenuOpen(false)}>
+            <X size={20} />
+          </button>
         </div>
-      <div className={`dashboard-sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
+
+        <div className="sidebar-user">
+          <div className="sidebar-avatar">
+            {getProfileImageUrl() ? (
+              <img src={getProfileImageUrl() || "/placeholder.svg"} alt="Profile" className="avatar-image" />
+            ) : (
+              <div className="avatar-placeholder">{userData?.username?.charAt(0) || "U"}</div>
+            )}
+          </div>
+          <div className="sidebar-user-info">
+            <h3>{userData?.username || "User"}</h3>
+            <p>{userData?.email || ""}</p>
+          </div>
+        </div>
+
         <nav className="sidebar-nav">
           <button
             className={`nav-item ${activeTab === "profile" ? "active" : ""}`}
-            onClick={() => setActiveTab("profile")}
+            onClick={() => {
+              setActiveTab("profile")
+              setIsMobileMenuOpen(false)
+            }}
           >
-            <User size={18} />
+            <User size={20} />
             <span>Profile</span>
           </button>
 
           <button
             className={`nav-item ${activeTab === "bookings" ? "active" : ""}`}
-            onClick={() => setActiveTab("bookings")}
+            onClick={() => {
+              setActiveTab("bookings")
+              setIsMobileMenuOpen(false)
+            }}
           >
-            <BookOpen size={18} />
+            <BookOpen size={20} />
             <span>Bookings</span>
           </button>
 
           <button
             className={`nav-item ${activeTab === "payments" ? "active" : ""}`}
-            onClick={() => setActiveTab("payments")}
+            onClick={() => {
+              setActiveTab("payments")
+              setIsMobileMenuOpen(false)
+            }}
           >
-            <CreditCard size={18} />
+            <CreditCard size={20} />
             <span>Payments</span>
           </button>
 
           <button
             className={`nav-item ${activeTab === "settings" ? "active" : ""}`}
-            onClick={() => setActiveTab("settings")}
+            onClick={() => {
+              setActiveTab("settings")
+              setIsMobileMenuOpen(false)
+            }}
           >
-            <Settings size={18} />
+            <Settings size={20} />
             <span>Settings</span>
           </button>
         </nav>
+
+        <div className="sidebar-footer">
+          <button className="logout-button">
+            <LogOut size={18} />
+            <span>Logout</span>
+          </button>
         </div>
-        
       </div>
 
+      {/* Main Content */}
       <div className="dashboard-main">
         <main className="dashboard-content">
-          <AnimatePresence mode="wait">
-            {activeTab === "profile" && (
-              <motion.div
-                key="profile"
-                className="profile-section"
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={containerVariants}
-              >
-                <motion.div className="section-header" variants={itemVariants}>
-                  <h2>My Profile</h2>
-                  <p>Manage your personal information and account details</p>
-                </motion.div>
+          {/* Profile Section */}
+          {activeTab === "profile" && (
+            <div className="profile-section">
+              <div className="section-header">
+                <h2>My Profile</h2>
+                <p>Manage your personal information and account details</p>
+              </div>
 
-                {isLoading ? (
-                  <div className="profile-card">
-                    <div className="card-header">
-                      <Skeleton className="h-8 w-1/3 mb-2" />
-                      <Skeleton className="h-4 w-1/2" />
-                    </div>
-                    <div className="card-content">
-                      <div className="skeleton-group">
-                        <Skeleton className="h-5 w-full" />
-                        <Skeleton className="h-5 w-full" />
-                        <Skeleton className="h-5 w-full" />
-                      </div>
+              {isLoading ? (
+                <div className="profile-card">
+                  <div className="profile-header skeleton-header">
+                    <Skeleton className="skeleton-avatar" />
+                    <div className="skeleton-info">
+                      <Skeleton className="skeleton-title" />
+                      <Skeleton className="skeleton-subtitle" />
                     </div>
                   </div>
-                ) : (
-                  <motion.div className="profile-card" variants={itemVariants}>
-                    <div className="profile-header">
-                      <div className="profile-avatar-container">
-                        <div className="profile-avatar" onClick={handleProfileImageClick}>
-                          {getProfileImageUrl() ? (
-                            <img
-                              src={getProfileImageUrl() || "/placeholder.svg"}
-                              alt="Profile"
-                              className="avatar-image"
-                            />
-                          ) : (
-                            userData?.username?.charAt(0) || "U"
-                          )}
-                          <div className="avatar-overlay">
-                            <Camera size={20} />
+                  <div className="profile-details">
+                    <Skeleton className="skeleton-section-title" />
+                    <div className="skeleton-details-grid">
+                      <Skeleton className="skeleton-detail-item" />
+                      <Skeleton className="skeleton-detail-item" />
+                      <Skeleton className="skeleton-detail-item" />
+                      <Skeleton className="skeleton-detail-item" />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="profile-card">
+                  <div className="profile-header">
+                    <div className="profile-avatar-container">
+                      <div className="profile-avatar" onClick={handleProfileImageClick}>
+                        {getProfileImageUrl() ? (
+                          <img
+                            src={getProfileImageUrl() || "/placeholder.svg"}
+                            alt="Profile"
+                            className="avatar-image"
+                          />
+                        ) : (
+                          <div className="avatar-text">{userData?.username?.charAt(0) || "U"}</div>
+                        )}
+                        <div className="avatar-overlay">
+                          <Camera size={20} />
+                        </div>
+                      </div>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        accept="image/*"
+                        className="hidden-file-input"
+                      />
+                    </div>
+                    <div className="profile-title">
+                      <h3>
+                        {userData?.username || "User"}
+                        {userData?.isVerified && (
+                          <span className="verification-badge" title="Verified Account">
+                            <CheckCircle size={16} className="verification-icon" />
+                          </span>
+                        )}
+                      </h3>
+                      <span className="member-since">
+                        <CalendarDays size={14} />
+                        Member since {formatDate(userData?.createdAt || new Date())}
+                      </span>
+                    </div>
+                    <button className="edit-profile-button" onClick={openEditModal}>
+                      <Edit size={16} />
+                      <span>Edit Profile</span>
+                    </button>
+                  </div>
+
+                  <div className="profile-details">
+                    <div className="detail-group">
+                      <h4>Personal Information</h4>
+                      <div className="detail-items">
+                        <div className="detail-item">
+                          <User className="detail-icon" size={18} />
+                          <div className="detail-content">
+                            <span className="detail-label">Full Name</span>
+                            <span className="detail-value">{userData?.username || "Not provided"}</span>
                           </div>
                         </div>
-                        <input
-                          type="file"
-                          ref={fileInputRef}
-                          onChange={handleFileChange}
-                          accept="image/*"
-                          className="hidden-file-input"
-                        />
+
+                        <div className="detail-item">
+                          <Mail className="detail-icon" size={18} />
+                          <div className="detail-content">
+                            <span className="detail-label">Email Address</span>
+                            <span className="detail-value">{userData?.email || "Not provided"}</span>
+                          </div>
+                        </div>
+
+                        {userData?.phone && (
+                          <div className="detail-item">
+                            <Phone className="detail-icon" size={18} />
+                            <div className="detail-content">
+                              <span className="detail-label">Phone Number</span>
+                              <span className="detail-value">{userData?.phone}</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {userData?.dob && (
+                          <div className="detail-item">
+                            <Calendar className="detail-icon" size={18} />
+                            <div className="detail-content">
+                              <span className="detail-label">Date of Birth</span>
+                              <span className="detail-value">{formatDate(userData?.dob)}</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <div className="profile-title">
-                        <h3>
-                          {userData?.username || "User"}
-                          {userData?.isVerified && (
-                            <span className="verification-badge" title="Verified Account">
-                              <CheckCircle size={16} className="verification-icon" />
+                    </div>
+
+                    <div className="detail-group">
+                      <h4>Account Statistics</h4>
+                      <div className="stats-cards">
+                        <div className="stat-card">
+                          <div className="stat-icon">
+                            <BookOpen size={20} />
+                          </div>
+                          <div className="stat-content">
+                            <span className="stat-value">{bookings.length}</span>
+                            <span className="stat-label">Total Bookings</span>
+                          </div>
+                        </div>
+
+                        <div className="stat-card">
+                          <div className="stat-icon">
+                            <Clock size={20} />
+                          </div>
+                          <div className="stat-content">
+                            <span className="stat-value">
+                              {userData?.lastLogin ? formatDate(userData.lastLogin) : "N/A"}
                             </span>
-                          )}
-                        </h3>
-                        <span className="member-since">
-                          <CalendarDays size={14} />
-                          Member since {formatDate(userData?.createdAt || new Date())}
-                        </span>
-                      </div>
-                      <motion.button
-                        className="edit-profile-button"
-                        onClick={openEditModal}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Edit size={16} />
-                        <span>Edit Profile</span>
-                      </motion.button>
-                    </div>
-
-                    <div className="profile-details">
-                      <div className="detail-group">
-                        <h4>Personal Information</h4>
-                        <div className="detail-items">
-                          <div className="detail-item">
-                            <User className="detail-icon" size={18} />
-                            <div className="detail-content">
-                              <span className="detail-label">Full Name</span>
-                              <span className="detail-value">{userData?.username || "Not provided"}</span>
-                            </div>
-                          </div>
-
-                          <div className="detail-item">
-                            <Mail className="detail-icon" size={18} />
-                            <div className="detail-content">
-                              <span className="detail-label">Email Address</span>
-                              <span className="detail-value">{userData?.email || "Not provided"}</span>
-                            </div>
-                          </div>
-
-                          {userData?.phone && (
-                            <div className="detail-item">
-                              <Phone className="detail-icon" size={18} />
-                              <div className="detail-content">
-                                <span className="detail-label">Phone Number</span>
-                                <span className="detail-value">{userData?.phone}</span>
-                              </div>
-                            </div>
-                          )}
-
-                          {userData?.dob && (
-                            <div className="detail-item">
-                              <Calendar className="detail-icon" size={18} />
-                              <div className="detail-content">
-                                <span className="detail-label">Date of Birth</span>
-                                <span className="detail-value">{formatDate(userData?.dob)}</span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="detail-group">
-                        <h4>Account Statistics</h4>
-                        <div className="stats-cards">
-                          <div className="stat-card">
-                            <div className="stat-icon">
-                              <BookOpen size={20} />
-                            </div>
-                            <div className="stat-content">
-                              <span className="stat-value">{bookings.length}</span>
-                              <span className="stat-label">Active Bookings</span>
-                            </div>
-                          </div>
-
-                          <div className="stat-card">
-                            <div className="stat-icon">
-                              <Clock size={20} />
-                            </div>
-                            <div className="stat-content">
-                              <span className="stat-value">
-                                {userData?.lastLogin ? formatDate(userData.lastLogin) : "N/A"}
-                              </span>
-                              <span className="stat-label">Last Login</span>
-                            </div>
+                            <span className="stat-label">Last Login</span>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </motion.div>
-            )}
 
-            {activeTab === "bookings" && (
-              <motion.div
-                key="bookings"
-                className="bookings-section"
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={containerVariants}
-              >
-                <motion.div className="section-header" variants={itemVariants}>
-                  <h2>My Bookings</h2>
-                  <p>View and manage your reservations</p>
-                </motion.div>
-
-                {isLoading ? (
-                  <div className="bookings-card">
-                    <div className="card-header">
-                      <Skeleton className="h-8 w-1/3 mb-2" />
-                      <Skeleton className="h-4 w-1/2" />
-                    </div>
-                    <div className="card-content">
-                      <div className="skeleton-group">
-                        <Skeleton className="h-16 w-full" />
-                        <Skeleton className="h-16 w-full" />
-                        <Skeleton className="h-16 w-full" />
+                        <div className="stat-card">
+                          <div className="stat-icon">
+                            <DollarSign size={20} />
+                          </div>
+                          <div className="stat-content">
+                            <span className="stat-value">
+                              ₹{bookings.reduce((total, booking) => total + booking.totalAmount, 0)}
+                            </span>
+                            <span className="stat-label">Total Spent</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                ) : (
-                  <motion.div className="bookings-card" variants={itemVariants}>
-                    <div className="bookings-header">
-                      <h3>Your Reservations</h3>
-                      <div className="bookings-filter">
-                        <button
-                          className={`filter-button ${bookingFilter === "all" ? "active" : ""}`}
-                          onClick={() => setBookingFilter("all")}
-                        >
-                          All
-                        </button>
-                        <button
-                          className={`filter-button ${bookingFilter === "upcoming" ? "active" : ""}`}
-                          onClick={() => setBookingFilter("upcoming")}
-                        >
-                          Upcoming
-                        </button>
-                        <button
-                          className={`filter-button ${bookingFilter === "past" ? "active" : ""}`}
-                          onClick={() => setBookingFilter("past")}
-                        >
-                          Past
-                        </button>
-                      </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Bookings Section */}
+          {activeTab === "bookings" && (
+            <div className="bookings-section">
+              <div className="section-header">
+                <h2>My Bookings</h2>
+                <p>View and manage your reservations</p>
+              </div>
+
+              {isLoading ? (
+                <div className="bookings-card">
+                  <div className="bookings-header skeleton-header">
+                    <Skeleton className="skeleton-title" />
+                    <div className="skeleton-filter">
+                      <Skeleton className="skeleton-filter-item" />
+                      <Skeleton className="skeleton-filter-item" />
+                      <Skeleton className="skeleton-filter-item" />
                     </div>
+                  </div>
+                  <div className="bookings-list">
+                    <Skeleton className="skeleton-booking" />
+                    <Skeleton className="skeleton-booking" />
+                    <Skeleton className="skeleton-booking" />
+                  </div>
+                </div>
+              ) : (
+                <div className="bookings-card">
+                  <div className="bookings-header">
+                    <h3>Your Reservations</h3>
+                    <div className="bookings-filter">
+                      <button
+                        className={`filter-button ${bookingFilter === "all" ? "active" : ""}`}
+                        onClick={() => setBookingFilter("all")}
+                      >
+                        All
+                      </button>
+                      <button
+                        className={`filter-button ${bookingFilter === "upcoming" ? "active" : ""}`}
+                        onClick={() => setBookingFilter("upcoming")}
+                      >
+                        Upcoming
+                      </button>
+                      <button
+                        className={`filter-button ${bookingFilter === "past" ? "active" : ""}`}
+                        onClick={() => setBookingFilter("past")}
+                      >
+                        Past
+                      </button>
+                    </div>
+                  </div>
 
-                    {getFilteredBookings().length === 0 ? (
-                      <div className="empty-bookings">
-                        <div className="empty-icon">
-                          <Calendar size={48} />
-                        </div>
-                        <h4>No {bookingFilter !== "all" ? bookingFilter : ""} Bookings Found</h4>
-                        <p>
-                          You don't have any {bookingFilter !== "all" ? bookingFilter : "active"} reservations at the
-                          moment.
-                        </p>
-                        <motion.button
-                          className="book-now-button"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => navigate("/rooms")}
-                        >
-                          <Home size={18} />
-                          <span>Book a Room</span>
-                        </motion.button>
+                  {getFilteredBookings().length === 0 ? (
+                    <div className="empty-bookings">
+                      <div className="empty-icon">
+                        <Calendar size={48} />
                       </div>
-                    ) : (
-                      <div className="bookings-list">
-                        {getFilteredBookings().map((booking, index) => (
-                          <motion.div key={booking._id} className="booking-item" variants={itemVariants} custom={index}>
-                            <div className="booking-main">
-                              <div className="booking-info">
-                                <div className="booking-title">
-                                  <h4>Room {booking.roomId}</h4>
-                                  <span className="booking-id">#{booking._id.substring(0, 8)}</span>
-                                </div>
-
-                                <div className="booking-details">
-                                  <div className="booking-dates">
-                                    <div className="date-range">
-                                      <span className="date-label">Check-in</span>
-                                      <span className="date-value">{formatDate(booking.startDate)}</span>
-                                    </div>
-                                    <div className="date-arrow">→</div>
-                                    <div className="date-range">
-                                      <span className="date-label">Check-out</span>
-                                      <span className="date-value">{formatDate(booking.endDate)}</span>
-                                    </div>
-                                  </div>
-
-                                  <div className="booking-meta">
-                                    <div className="meta-item">
-                                      <Clock size={16} />
-                                      <span>{calculateNights(booking.startDate, booking.endDate)} nights</span>
-                                    </div>
-                                    <div className="meta-item">
-                                      <Users size={16} />
-                                      <span>
-                                        {booking.adults} Adults, {booking.children} Children
-                                      </span>
-                                    </div>
-                                    <div className="meta-item">
-                                      <DollarSign size={16} />
-                                      <span>₹{booking.totalAmount}</span>
-                                    </div>
-                                  </div>
-                                </div>
+                      <h4>No {bookingFilter !== "all" ? bookingFilter : ""} Bookings Found</h4>
+                      <p>
+                        You don't have any {bookingFilter !== "all" ? bookingFilter : "active"} reservations at the
+                        moment.
+                      </p>
+                      <button
+                        className="book-now-button"
+                        onClick={() => {
+                          /* Navigate to rooms */
+                        }}
+                      >
+                        <Home size={18} />
+                        <span>Book a Room</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="bookings-list">
+                      {getFilteredBookings().map((booking) => (
+                        <div key={booking._id} className="booking-item">
+                          <div className="booking-main">
+                            <div className="booking-info">
+                              <div className="booking-title">
+                                <h4>{booking.roomId}</h4>
+                                <span className="booking-id">#{booking._id.substring(0, 8)}</span>
                               </div>
 
-                              <div className="booking-actions">
-                                <motion.button
-                                  className="action-button download"
-                                  onClick={() => handleDownloadBookingDetails(booking)}
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                >
-                                  <Download size={16} />
-                                  <span>Download</span>
-                                </motion.button>
+                              <div className="booking-details">
+                                <div className="booking-dates">
+                                  <div className="date-range">
+                                    <span className="date-label">Check-in</span>
+                                    <span className="date-value">{formatDate(booking.startDate)}</span>
+                                  </div>
+                                  <div className="date-arrow">→</div>
+                                  <div className="date-range">
+                                    <span className="date-label">Check-out</span>
+                                    <span className="date-value">{formatDate(booking.endDate)}</span>
+                                  </div>
+                                </div>
 
-                                {canCancelBooking(booking) ? (
-                                  <motion.button
-                                    className="action-button cancel"
-                                    onClick={() => handleCancelBooking(booking._id)}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                  >
-                                    <X size={16} />
-                                    <span>Cancel</span>
-                                  </motion.button>
-                                ) : (
-                                  <motion.button
-                                    className="action-button cancel disabled"
-                                    disabled
-                                    title="Cancellation is not available for this booking"
-                                  >
-                                    <X size={16} />
-                                    <span>Cancel</span>
-                                  </motion.button>
-                                )}
+                                <div className="booking-meta">
+                                  <div className="meta-item">
+                                    <Clock size={16} />
+                                    <span>{calculateNights(booking.startDate, booking.endDate)} nights</span>
+                                  </div>
+                                  <div className="meta-item">
+                                    <Users size={16} />
+                                    <span>
+                                      {booking.adults} Adults, {booking.children} Children
+                                    </span>
+                                  </div>
+                                  <div className="meta-item">
+                                    <DollarSign size={16} />
+                                    <span>₹{booking.totalAmount}</span>
+                                  </div>
+                                </div>
                               </div>
                             </div>
 
-                            <div className="booking-status">
-                              <div className="status-badge confirmed">
-                                <CheckCircle size={14} />
-                                <span>Confirmed</span>
-                              </div>
+                            <div className="booking-actions">
+                              <button
+                                className="action-button download"
+                                onClick={() => handleDownloadBookingDetails(booking)}
+                              >
+                                <Download size={16} />
+                                <span>Download</span>
+                              </button>
 
-                              {new Date(booking.startDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) && (
-                                <div className="status-badge upcoming">
-                                  <AlertTriangle size={14} />
-                                  <span>Upcoming</span>
-                                </div>
+                              {canCancelBooking(booking) ? (
+                                <button
+                                  className="action-button cancel"
+                                  onClick={() => handleCancelBooking(booking._id)}
+                                >
+                                  <X size={16} />
+                                  <span>Cancel</span>
+                                </button>
+                              ) : (
+                                <button
+                                  className="action-button cancel disabled"
+                                  disabled
+                                  title="Cancellation is not available for this booking"
+                                >
+                                  <X size={16} />
+                                  <span>Cancel</span>
+                                </button>
                               )}
                             </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-              </motion.div>
-            )}
+                          </div>
 
-            {activeTab === "settings" && <SettingsSection userData={userData} navigate={navigate} />}
-          </AnimatePresence>
+                          <div className="booking-status">
+                            <div className="status-badge confirmed">
+                              <CheckCircle size={14} />
+                              <span>Confirmed</span>
+                            </div>
+
+                            {new Date(booking.startDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) && (
+                              <div className="status-badge upcoming">
+                                <AlertTriangle size={14} />
+                                <span>Upcoming</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Payments Section */}
+          {activeTab === "payments" && <PaymentsSection />}
+
+          {/* Settings Section */}
+          {activeTab === "settings" && <SettingsSection />}
         </main>
       </div>
 
       {/* Edit Profile Modal */}
-      <AnimatePresence>
-        {isEditing && (
-          <motion.div
-            className="modal-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsEditing(false)}
-          >
-            <motion.div
-              className="modal-container"
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="modal-header">
-                <h3>Edit Profile</h3>
-                <motion.button
-                  className="modal-close"
-                  onClick={() => setIsEditing(false)}
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <X size={20} />
-                </motion.button>
+      {isEditing && (
+        <div className="modal-overlay" onClick={() => setIsEditing(false)}>
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Edit Profile</h3>
+              <button className="modal-close" onClick={() => setIsEditing(false)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <div className="form-group">
+                <label htmlFor="username">Full Name</label>
+                <input
+                  id="username"
+                  type="text"
+                  value={updatedUserData.username}
+                  onChange={(e) => setUpdatedUserData({ ...updatedUserData, username: e.target.value })}
+                  placeholder="Enter your full name"
+                  className="form-input"
+                />
               </div>
 
-              <div className="modal-body">
-                <div className="form-group">
-                  <label htmlFor="username">Full Name</label>
-                  <input
-                    id="username"
-                    type="text"
-                    value={updatedUserData.username}
-                    onChange={(e) => setUpdatedUserData({ ...updatedUserData, username: e.target.value })}
-                    placeholder="Enter your full name"
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="email">Email Address (Read Only)</label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={userData?.email}
-                    readOnly
-                    disabled
-                    className="form-input disabled"
-                  />
-                  <small className="form-hint">Email address cannot be changed</small>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="phone">Phone Number</label>
-                  <input
-                    id="phone"
-                    type="tel"
-                    value={updatedUserData.phone}
-                    onChange={(e) => setUpdatedUserData({ ...updatedUserData, phone: e.target.value })}
-                    placeholder="Enter your phone number"
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="dob">Date of Birth</label>
-                  <input
-                    id="dob"
-                    type="date"
-                    value={updatedUserData.dob}
-                    onChange={(e) => setUpdatedUserData({ ...updatedUserData, dob: e.target.value })}
-                    className="form-input"
-                  />
-                </div>
+              <div className="form-group">
+                <label htmlFor="email">Email Address (Read Only)</label>
+                <input
+                  id="email"
+                  type="email"
+                  value={userData?.email}
+                  readOnly
+                  disabled
+                  className="form-input disabled"
+                />
+                <small className="form-hint">Email address cannot be changed</small>
               </div>
 
-              <div className="modal-footer">
-                <motion.button
-                  className="button cancel-button"
-                  onClick={() => setIsEditing(false)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Cancel
-                </motion.button>
-                <motion.button
-                  className="button save-button"
-                  onClick={handleUpdateUserDetails}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Save Changes
-                </motion.button>
+              <div className="form-group">
+                <label htmlFor="phone">Phone Number</label>
+                <input
+                  id="phone"
+                  type="tel"
+                  value={updatedUserData.phone}
+                  onChange={(e) => setUpdatedUserData({ ...updatedUserData, phone: e.target.value })}
+                  placeholder="Enter your phone number"
+                  className="form-input"
+                />
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+              <div className="form-group">
+                <label htmlFor="dob">Date of Birth</label>
+                <input
+                  id="dob"
+                  type="date"
+                  value={updatedUserData.dob}
+                  onChange={(e) => setUpdatedUserData({ ...updatedUserData, dob: e.target.value })}
+                  className="form-input"
+                />
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button className="button cancel-button" onClick={() => setIsEditing(false)}>
+                Cancel
+              </button>
+              <button className="button save-button" onClick={handleUpdateUserDetails}>
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* PDF Generation Loading Overlay */}
-      <AnimatePresence>
-        {isGeneratingPdf && (
-          <motion.div className="pdf-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <motion.div
-              className="pdf-container"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            >
-              <div className="pdf-icon">
-                <FileText size={48} />
-              </div>
+      {isGeneratingPdf && (
+        <div className="pdf-overlay">
+          <div className="pdf-container">
+            <div className="pdf-icon">
+              <FileText size={48} />
+            </div>
 
-              <h3>Generating Your Booking PDF</h3>
-              <p>Royal Castle Farm Stay - Booking #{generatingBookingId?.substring(0, 8)}</p>
+            <h3>Generating Your Booking PDF</h3>
+            <p>Royal Castle Farm Stay - Booking #{generatingBookingId?.substring(0, 8)}</p>
 
-              <div className="progress-bar">
-                <div className="progress-fill"></div>
-              </div>
+            <div className="progress-bar">
+              <div className="progress-fill"></div>
+            </div>
 
-              <div className="pdf-steps">
-                <div className="pdf-step active">
-                  <div className="step-indicator">1</div>
-                  <span>Collecting data</span>
-                </div>
-                <div className="pdf-step">
-                  <div className="step-indicator">2</div>
-                  <span>Formatting document</span>
-                </div>
-                <div className="pdf-step">
-                  <div className="step-indicator">3</div>
-                  <span>Finalizing PDF</span>
-                </div>
+            <div className="pdf-steps">
+              <div className="pdf-step active">
+                <div className="step-indicator">1</div>
+                <span>Collecting data</span>
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <div className="pdf-step">
+                <div className="step-indicator">2</div>
+                <span>Formatting document</span>
+              </div>
+              <div className="pdf-step">
+                <div className="step-indicator">3</div>
+                <span>Finalizing PDF</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notifications */}
+      <div className="notifications-container">
+        {notifications.map((notification) => (
+          <div key={notification.id} className={`notification ${notification.type}`}>
+            <div className="notification-content">
+              <span>{notification.message}</span>
+              <button
+                className="notification-close"
+                onClick={() => setNotifications((prev) => prev.filter((n) => n.id !== notification.id))}
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
