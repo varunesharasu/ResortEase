@@ -6,8 +6,8 @@ import "./guide-tour.css"
 export default function GuideTour({ onClose, isOpen }) {
   const [currentStep, setCurrentStep] = useState(0)
   const [targetElement, setTargetElement] = useState(null)
-  const [isAnimating, setIsAnimating] = useState(false)
   const [showWelcomeDialog, setShowWelcomeDialog] = useState(false)
+  const [currentPosition, setCurrentPosition] = useState(0) // Store current scroll position
 
   const steps = [
     {
@@ -71,6 +71,9 @@ export default function GuideTour({ onClose, isOpen }) {
 
   useEffect(() => {
     if (isOpen && steps[currentStep]) {
+      // Store current scroll position before scrolling
+      setCurrentPosition(window.pageYOffset)
+
       const element = document.querySelector(steps[currentStep].target)
       if (element) {
         setTargetElement(element)
@@ -82,96 +85,45 @@ export default function GuideTour({ onClose, isOpen }) {
 
         // Add highlight effect to the target element
         element.classList.add("guide-highlight")
-
-        // Create spotlight effect
-        updateSpotlight(element)
-
-        return () => {
-          element.classList.remove("guide-highlight")
-        }
       }
     }
 
-    // Clean up spotlight when component unmounts
     return () => {
-      const spotlight = document.querySelector(".guide-spotlight")
-      if (spotlight) {
-        spotlight.remove()
+      // Clean up highlight when component unmounts or step changes
+      const highlightedElement = document.querySelector(".guide-highlight")
+      if (highlightedElement) {
+        highlightedElement.classList.remove("guide-highlight")
       }
     }
   }, [currentStep, isOpen, steps])
 
-  // Update spotlight position and size
-  const updateSpotlight = (element) => {
-    const rect = element.getBoundingClientRect()
-
-    // Remove existing spotlight if any
-    const existingSpotlight = document.querySelector(".guide-spotlight")
-    if (existingSpotlight) {
-      existingSpotlight.remove()
-    }
-
-    // Create new spotlight
-    const spotlight = document.createElement("div")
-    spotlight.className = "guide-spotlight"
-    spotlight.style.top = `${rect.top + window.scrollY}px`
-    spotlight.style.left = `${rect.left + window.scrollX}px`
-    spotlight.style.width = `${rect.width}px`
-    spotlight.style.height = `${rect.height}px`
-
-    document.body.appendChild(spotlight)
-  }
-
   const handleNext = () => {
-    if (isAnimating) return
-
-    setIsAnimating(true)
-
-    setTimeout(() => {
-      if (currentStep < steps.length - 1) {
-        setCurrentStep(currentStep + 1)
-      } else {
-        handleClose()
-      }
-      setIsAnimating(false)
-    }, 300)
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1)
+    } else {
+      handleClose()
+    }
   }
 
   const handlePrev = () => {
-    if (isAnimating || currentStep === 0) return
-
-    setIsAnimating(true)
-
-    setTimeout(() => {
+    if (currentStep > 0) {
       setCurrentStep(currentStep - 1)
-      setIsAnimating(false)
-    }, 300)
+    }
   }
 
   const handleClose = () => {
-    setIsAnimating(true)
+    // Restore the original scroll position when closing the tour
+    window.scrollTo({ top: currentPosition, behavior: "smooth" })
 
-    setTimeout(() => {
-      onClose(false)
-      setCurrentStep(0)
-      setIsAnimating(false)
-
-      // Remove spotlight
-      const spotlight = document.querySelector(".guide-spotlight")
-      if (spotlight) {
-        spotlight.remove()
-      }
-    }, 300)
+    onClose(false)
+    setCurrentStep(0)
   }
 
   const startTour = () => {
     // Mark that the user has visited before
     localStorage.setItem("hasVisitedBefore", "true")
     setShowWelcomeDialog(false)
-    onClose(false) // Reset the tour state in parent
-    setTimeout(() => {
-      onClose(true) // Start the tour
-    }, 100)
+    onClose(true) // Start the tour
   }
 
   const skipTour = () => {
@@ -183,13 +135,12 @@ export default function GuideTour({ onClose, isOpen }) {
   // Render welcome dialog
   if (showWelcomeDialog) {
     return (
-      <div className="guide-tour-overlay">
-        <div className="guide-overlay"></div>
-        <div className="guide-welcome-card">
+      <div className="guide-welcome-container">
+        <div className="guide-welcome-dialog">
           <div className="guide-welcome-header">
             <div className="guide-welcome-icon">🏰</div>
-            <h2>Discover Royal Castle</h2>
-            <button onClick={skipTour} className="guide-close-btn" aria-label="Close welcome dialog">
+            <h2>Welcome to Royal Castle</h2>
+            <button onClick={skipTour} className="guide-close-button" aria-label="Close welcome dialog">
               <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -197,13 +148,13 @@ export default function GuideTour({ onClose, isOpen }) {
             </button>
           </div>
           <div className="guide-welcome-content">
-            <p>Would you like to take a quick tour of our website to discover all we have to offer?</p>
+            <p>Would you like to take a quick tour of our website?</p>
             <div className="guide-welcome-buttons">
-              <button onClick={startTour} className="guide-btn guide-btn-primary">
+              <button onClick={startTour} className="guide-start-button">
                 Start Tour
               </button>
-              <button onClick={skipTour} className="guide-btn guide-btn-secondary">
-                Maybe Later
+              <button onClick={skipTour} className="guide-skip-button">
+                Skip
               </button>
             </div>
           </div>
@@ -227,64 +178,55 @@ export default function GuideTour({ onClose, isOpen }) {
   const isLastStep = currentStep === steps.length - 1
 
   return (
-    <div className="guide-tour-overlay">
-      {/* Overlay */}
-      <div className="guide-overlay"></div>
-
-      {/* Tour Card */}
-      <div className={`guide-tour-card ${isAnimating ? "guide-card-animating" : ""}`}>
-        {/* Progress indicator */}
-        <div className="guide-progress-indicator">
-          {steps.map((_, index) => (
-            <div
-              key={index}
-              className={`guide-progress-dot ${index === currentStep ? "active" : ""} ${index < currentStep ? "completed" : ""}`}
-            />
-          ))}
+    <div className="guide-tour-container">
+      {/* Tour tooltip - positioned at bottom left */}
+      <div className="guide-tooltip">
+        {/* Progress bar */}
+        <div className="guide-progress-bar">
+          <div
+            className="guide-progress-indicator"
+            style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+          ></div>
         </div>
 
-        {/* Content */}
-        <div className="guide-card-content">
-          <div className="guide-card-header">
-            <div className="guide-step-icon">{steps[currentStep].icon}</div>
-            <div className="guide-step-info">
-              <h3>{steps[currentStep].title}</h3>
-              <div className="guide-step-counter">
-                Step {currentStep + 1} of {steps.length}
-              </div>
-            </div>
-            <button onClick={handleClose} className="guide-close-btn" aria-label="Close guide">
-              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
+        <div className="guide-tooltip-header">
+          <div className="guide-tooltip-icon">{steps[currentStep].icon}</div>
+          <div className="guide-tooltip-title">{steps[currentStep].title}</div>
+          <button onClick={handleClose} className="guide-close-button" aria-label="Close guide">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div className="guide-tooltip-step">
+          Step {currentStep + 1} of {steps.length}
+        </div>
+
+        <div className="guide-tooltip-content">
+          <p>{steps[currentStep].content}</p>
+        </div>
+
+        <div className="guide-tooltip-footer">
+          {currentStep > 0 && (
+            <button onClick={handlePrev} className="guide-prev-button">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
               </svg>
+              Back
             </button>
-          </div>
-
-          <div className="guide-card-body">
-            <p>{steps[currentStep].content}</p>
-          </div>
-
-          <div className="guide-card-footer">
-            {currentStep > 0 && (
-              <button onClick={handlePrev} className="guide-btn guide-btn-secondary">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none">
-                  <line x1="19" y1="12" x2="5" y2="12"></line>
-                  <polyline points="12 19 5 12 12 5"></polyline>
-                </svg>
-                Back
-              </button>
+          )}
+          <button onClick={handleNext} className="guide-next-button">
+            {isLastStep ? "Finish" : "Next"}
+            {!isLastStep && (
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
             )}
-            <button onClick={handleNext} className="guide-btn guide-btn-primary">
-              {isLastStep ? "Finish" : "Next"}
-              {!isLastStep && (
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none">
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                  <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
-              )}
-            </button>
-          </div>
+          </button>
         </div>
       </div>
     </div>
