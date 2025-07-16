@@ -654,7 +654,3 @@
   }
 }
 
-/* Additional styles for the payment method modal */
-.payment-modal {
-  animation: fadeIn 0.3s ease-out;
-}
