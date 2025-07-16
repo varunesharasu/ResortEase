@@ -714,3 +714,9 @@ button {
   align-items: center;
   gap: 16px;
 }
+.cookie-preferences-header h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 18px;
+  font-weight: 600;
+}
