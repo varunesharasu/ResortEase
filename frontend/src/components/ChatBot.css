@@ -120,21 +120,4 @@
   }
   
   
-  @media (max-width: 360px) {
-    .chatbot-container {
-      width: 90vw;
-    }
-    
-    .chatbot-container.expanded {
-      height: 400px;
-    }
-    
-    .chat-input {
-      font-size: 0.8rem;
-    }
-    
-    .send-button {
-      padding: 6px 12px;
-      font-size: 0.8rem;
-    }
-  }
+  
