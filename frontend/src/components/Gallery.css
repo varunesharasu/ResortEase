@@ -708,3 +708,9 @@ button {
     font-size: 1rem;
   }
 }
+
+  .cookie-preferences-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
