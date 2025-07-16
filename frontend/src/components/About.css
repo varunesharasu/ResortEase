@@ -664,4 +664,11 @@
     animation: none;
   }
   
-  
+
+  /* Accessibility Enhancements */
+  .about-page,
+  .about-page * {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+  }
