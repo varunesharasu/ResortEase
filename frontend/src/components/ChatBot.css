@@ -108,7 +108,6 @@
     cursor: not-allowed;
   }
   
-  /* Responsive adjustments */
   @media (max-width: 480px) {
     .chatbot-container {
       width: 300px;
