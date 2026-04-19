@@ -12,7 +12,7 @@ const fs = require("fs")
 const nodemailer = require("nodemailer")
 
 const app = express()
-const PORT = 5000
+const PORT = Number(process.env.PORT) || 5000
 
 // Middleware
 app.use(cors())
@@ -22,10 +22,7 @@ app.use(bodyParser.json())
 app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
 // MongoDB Connection
-mongoose.connect("mongodb+srv://varunesharasu:varunesh@cluster1.lvoka.mongodb.net/resortBooking", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect("mongodb+srv://varunesharasu:varunesh@cluster1.lvoka.mongodb.net/resortBooking")
 
 // Check MongoDB connection
 const db = mongoose.connection
@@ -989,6 +986,15 @@ const server = http.createServer(app)
 // Create WebSocket server
 const wss = new WebSocket.Server({ server })
 
+wss.on("error", (error) => {
+  if (error.code === "EADDRINUSE") {
+    console.error(`WebSocket server could not bind to port ${PORT} because it is already in use.`)
+    return
+  }
+
+  console.error("WebSocket server error:", error)
+})
+
 // WebSocket connection handler
 wss.on("connection", (ws) => {
   console.log("Client connected")
@@ -1171,6 +1177,16 @@ app.post("/api/reset-password", async (req, res) => {
 })
 
 // Modify the server.listen to use the HTTP server
+server.on("error", (error) => {
+  if (error.code === "EADDRINUSE") {
+    console.error(`Port ${PORT} is already in use. Stop the running process or use a different PORT.`)
+    process.exit(1)
+  }
+
+  console.error("Server failed to start:", error)
+  process.exit(1)
+})
+
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)
 })
