@@ -101,8 +101,3 @@ ResortEase is a full-stack, production-ready resort management solution designed
 2. Create a feature branch
 3. Commit changes with clear messages
 4. Open a pull request
-
----
-
-## License
-MIT License
