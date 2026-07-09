@@ -106,8 +106,3 @@ ResortEase is a full-stack, production-ready resort management solution designed
 
 ## License
 MIT License
-
----
-
-## Contact
-For questions, support, or demo requests, contact [varunesharasu](https://github.com/varunesharasu).
