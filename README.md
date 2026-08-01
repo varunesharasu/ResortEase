@@ -39,7 +39,12 @@ ResortEase is a full-stack, production-ready resort management solution designed
 - **DevOps:** npm scripts, environment variables, modular codebase
 
 ---
-
+## Architecture Diagram
+```
+[Client: Frontend (React.js)] <--> [Backend API (Express.js)] <--> [Database (MongoDB)]
+         |                              |                          |
+   Guest Portal                Admin Dashboard                Data Models
+```
 
 ---
 
